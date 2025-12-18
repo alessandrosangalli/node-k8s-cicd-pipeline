@@ -1,22 +1,21 @@
 # Stage 1: Build & Install Dependencies
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-# Install only production dependencies for the final image to keep it small
-# Ideally we would do a full install in a separate CI stage for testing, 
-# but for the container optimization, we want prod only.
+# Install only production dependencies
 RUN npm ci --only=production
 
 # Stage 2: Production Run
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
-# Install dumb-init for proper signal handling
-RUN apk add --no-cache dumb-init
+# Install dumb-init and update npm to fix internal vulnerabilities
+RUN apk add --no-cache dumb-init && \
+    npm install -g npm@latest
 
 # Create a non-root user
 USER node
