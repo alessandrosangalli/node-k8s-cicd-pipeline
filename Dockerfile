@@ -13,11 +13,13 @@ FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
-# Install dumb-init
-RUN apk add --no-cache dumb-init
+# Install dumb-init and upgrade npm to fix vulnerabilities in the base image
+RUN apk add --no-cache dumb-init && \
+    npm install -g npm@latest
 
 # Create a non-root user
 USER node
+
 
 # Copy only necessary files
 COPY --chown=node:node --from=builder /usr/src/app/node_modules ./node_modules
