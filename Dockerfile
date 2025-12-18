@@ -13,16 +13,15 @@ FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
-# Install dumb-init and update npm to fix internal vulnerabilities
-RUN apk add --no-cache dumb-init && \
-    npm install -g npm@latest
+# Install dumb-init
+RUN apk add --no-cache dumb-init
 
 # Create a non-root user
 USER node
 
-# Copy node_modules from builder
+# Copy only necessary files
 COPY --chown=node:node --from=builder /usr/src/app/node_modules ./node_modules
-COPY --chown=node:node . .
+COPY --chown=node:node src ./src
 
 ENV NODE_ENV=production
 ENV PORT=3000
@@ -30,3 +29,4 @@ ENV PORT=3000
 EXPOSE 3000
 
 CMD ["dumb-init", "node", "src/server.js"]
+

@@ -94,7 +94,8 @@ This project implements a fully automated **DevSecOps** pipeline. Below is the e
 
 ### 1. Code Quality Assurance (CI)
 *   **Trigger**: Fires on every `push` or `pull_request` to the `main` branch.
-*   **Environment**: Runs on `ubuntu-latest` with Node.js 18.
+*   **Environment**: Runs on `ubuntu-latest` with Node.js 20.
+*   **Linting**: Runs `npm run lint` (ESLint) to ensure code style consistency.
 *   **Deterministic Install**: Uses `npm ci` instead of `npm install` to ensure the exact dependency versions from `package-lock.json` are used.
 *   **Testing**: Executes `npm test` (Jest) to validate application logic. If tests fail, the pipeline stops immediately.
 
@@ -106,7 +107,7 @@ Before building artifacts, we scan the codebase to prevent vulnerabilities from 
 ### 3. Artifact Build & Optimization
 *   **Multi-Stage Dockerfile**:
     *   **Stage 1 (Builder)**: Installs full dependencies to support the build process.
-    *   **Stage 2 (Production)**: Copies only the `dist` or production `node_modules`. Base image is `node:18-alpine` (lightweight/reduced attack surface).
+    *   **Stage 2 (Production)**: Copies only the production `node_modules` and source code. Base image is `node:20-alpine` (lightweight/reduced attack surface).
 *   **Container Security**:
     *   **Non-Root User**: The application explicitly switches to the `node` user (UID 1000). It does *not* run as root.
     *   **PID 1 Handling**: Uses `dumb-init` to correctly handle kernel signals (SIGTERM/SIGINT) for graceful shutdowns.
