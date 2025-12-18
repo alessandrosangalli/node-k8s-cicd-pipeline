@@ -24,7 +24,7 @@ spec:
         fsGroup: 2000
       containers:
         - name: node-app
-          image: ghcr.io/YOUR_USERNAME/node-k8s-service:latest # Placeholder
+          image: ghcr.io/alessandrosangalli/node-k8s-service:latest # Placeholder
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
