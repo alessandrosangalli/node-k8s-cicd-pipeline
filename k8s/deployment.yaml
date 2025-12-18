@@ -24,7 +24,7 @@ spec:
         fsGroup: 2000
       containers:
         - name: node-app
-          image: ghcr.io/alessandrosangalli/node-k8s-service:latest # Placeholder
+          image: ghcr.io/alessandrosangalli/node-k8s-cicd-pipeline:27f94d5e4a09ff0a2a42ae2de62d63145f2f80bd
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
