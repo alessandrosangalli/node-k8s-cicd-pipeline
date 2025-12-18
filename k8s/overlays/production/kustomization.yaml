@@ -1,0 +1,11 @@
+resources:
+  - ../../base
+
+patches:
+  - target:
+      kind: Rollout
+      name: node-k8s-app
+    patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 10 # Em produção queremos 10 replicas

@@ -1,125 +1,105 @@
-# Gold Standard Node.js Kubernetes Pipeline
+# Pipeline Kubernetes Estado da Arte
 
-This project demonstrates a production-grade **DevSecOps** pipeline for a Node.js microservice. It uses the industry's most sought-after (free) tools to create a robust, secure, and scalable deployment architecture.
+Este projeto demonstra uma pipeline **DevSecOps** de nível profissional para um microserviço Node.js. Ele utiliza as ferramentas mais avançadas do mercado para criar uma arquitetura de deploy robusta, segura, escalável e com entrega progressiva.
 
-## 🏆 Project Highlights (Why is this "Gold Standard"?)
+## 🏆 Destaques do Projeto (Por que é "Estado da Arte"?)
 
-*   **GitOps Workflow**: Uses **ArgoCD** for continuous deployment. The registry is the source of truth.
-*   **Security First**:
-    *   **Trivy**: Automated vulnerability scanning for both filesystem and container images in the CI pipeline.
-    *   **Non-Root User**: The container runs as a non-privileged `node` user.
-    *   **Helmet**: HTTP header security.
-*   **Observability**:
-    *   **Prometheus Metrics**: Built-in `/metrics` endpoint exposing runtime metrics (CPU, Memory, Request counts).
-    *   **Structured Logging**: Uses `Winston` for JSON-formatted logs, ready for ELK/Datadog ingestion.
-    *   **Health Probes**: Implements liveness and readiness probes for Kubernetes self-healing.
-*   **Performance & Scalability**:
-    *   **Horizontal Pod Autoscaler (HPA)**: Automatically scales pods based on CPU utilization.
-    *   **Multi-Stage Builds**: Dockerfile is optimized for cache layering and small image size.
-*   **Testing**: Includes Unit/Integration tests with **Jest** and **Supertest**.
+*   **Entrega Progressiva (Canary Deployments)**: Utiliza **Argo Rollouts** para gerenciar deploys graduais. Em vez de substituir tudo de uma vez, a nova versão recebe tráfego aos poucos (20%, 50%, 100%), permitindo validar a estabilidade antes da conclusão.
+*   **GitOps com Kustomize**: Gerenciamento declarativo de ambientes usando **Kustomize**. Estrutura de `base` e `overlays` para gerenciar diferentes configurações (Dev, Staging, Prod) sem duplicar código.
+*   **Fluxo GitOps Nativo**: Integração com **ArgoCD** para garantir que o estado do cluster Kubernetes seja sempre idêntico ao que está definido no Git.
+*   **Security First (Segurança em Primeiro Lugar)**:
+    *   **Trivy**: Escaneamento automatizado de vulnerabilidades no sistema de arquivos e nas camadas da imagem Docker. A pipeline falha automaticamente se encontrar vulnerabilidades `CRITICAL` ou `HIGH`.
+    *   **Usuário Não-Root**: O container roda estritamente com o usuário `node` (UID 1000), reduzindo a superfície de ataque.
+    *   **Helmet.js**: Implementação de cabeçalhos de segurança HTTP.
+*   **Observabilidade Avançada**:
+    *   **Métricas Prometheus**: Endpoint `/metrics` nativo expondo uso de CPU, memória e contagem de requisições.
+    *   **Logging Estruturado**: Utiliza `Winston` com formato JSON em produção (ideal para ELK/Datadog) e formato amigável com cores em desenvolvimento.
+*   **Performance & Escalabilidade**:
+    *   **HPA (Horizontal Pod Autoscaler)**: Escalabilidade automática baseada no uso de CPU.
+    *   **Builds Multi-estágio**: Dockerfile otimizado para cache e tamanho reduzido da imagem final.
 
-## 🛠 Tech Stack
+## 🛠 Stack Tecnológica
 
-*   **Application**: Node.js, Express, Winston, Prom-client
-*   **CI**: GitHub Actions
-*   **CD**: ArgoCD
-*   **Container**: Docker
-*   **Orchestration**: Kubernetes (compatible with Minikube, Kind, EKS, GKE)
-*   **Scanner**: AquaSecurity Trivy
+*   **Aplicação**: Node.js 20 (LTS), Express, Winston, Prom-client
+*   **CI (Integração Contínua)**: GitHub Actions
+*   **CD (Entrega Contínua)**: ArgoCD & Argo Rollouts
+*   **Infraestrutura**: Kubernetes, Kustomize
+*   **Container**: Docker (GHCR como Registry)
+*   **Segurança**: AquaSecurity Trivy
 
-## 🚀 Getting Started
+## 🚀 Como Começar
 
-### Prerequisites
+### Pré-requisitos
 
 *   Node.js & npm
 *   Docker
-*   Kubernetes Cluster (Minikube or Kind recommended for local)
-*   kubectl
+*   Cluster Kubernetes (Minikube ou Kind para local)
+*   kubectl & kustomize
 
-### Local Development
+### Desenvolvimento Local
 
-1.  **Install Dependencies**
+1.  **Instalar Dependências**
     ```bash
     npm install
     ```
 
-2.  **Run Locally** (with hot-reload)
+2.  **Executar em Modo Dev** (com hot-reload)
     ```bash
     npm run dev
     ```
 
-3.  **Run Tests**
+3.  **Executar Testes & Lint**
     ```bash
     npm test
+    npm run lint
     ```
 
-4.  **View Metrics**
-    Visit `http://localhost:3000/metrics`.
-
-### 🐳 Docker Build
+### 🐳 Build Docker Local
 
 ```bash
-docker build -t node-k8s-service .
-docker run -p 3000:3000 node-k8s-service
+docker build -t node-k8s-app .
+docker run -p 3000:3000 node-k8s-app
 ```
 
-## ☸️ Kubernetes Deployment
+## ☸️ Deploy no Kubernetes
 
-### 1. Manual Deployment (For Testing)
+### 1. Estrutura Kustomize
 
+O projeto utiliza a seguinte estrutura:
+- `k8s/base`: Manifestos base (Rollout, Service, HPA, Ingress).
+- `k8s/overlays/production`: Customizações específicas para produção (ex: número de réplicas).
+
+Para visualizar os manifestos finais:
 ```bash
-# Apply all manifests
-kubectl apply -f k8s/
+kubectl kustomize k8s/overlays/production
 ```
 
-### 2. GitOps Deployment (ArgoCD) - *Recommended*
+### 2. Deploy via ArgoCD
 
-1.  Install ArgoCD in your cluster:
-    ```bash
-    kubectl create namespace argocd
-    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-    ```
-
-2.  Apply the Application Manifest:
-    *(Ensure you have pushed this code to your own GitHub repository first and updated `argocd/application.yaml` with your repo URL)*
+1.  Crie o namespace e instale o ArgoCD no seu cluster.
+2.  Aplique o manifesto da aplicação:
     ```bash
     kubectl apply -f argocd/application.yaml
     ```
 
-3.  Access ArgoCD UI and watch the magic happen.
+## ⚙️ Arquitetura da Pipeline (Deep Dive)
 
-## ⚙️ Pipeline Architecture & Workflow (Deep Dive)
+### 1. Garantia de Qualidade e Segurança (CI)
+*   **Linting**: Validação do estilo de código com ESLint.
+*   **Testes**: Execução de testes unitários e de integração com Jest.
+*   **Scan de Código**: O Trivy varre o sistema de arquivos em busca de dependências vulneráveis.
 
-This project implements a fully automated **DevSecOps** pipeline. Below is the exact step-by-step process that occurs on every code change.
+### 2. Build e Otimização de Imagem
+*   A imagem é construída usando o Dockerfile multi-estágio.
+*   O `npm` é atualizado globalmente e o `dumb-init` é instalado para gerenciar corretamente os processos (PID 1).
+*   Um segundo scan do Trivy é feito diretamente na imagem final antes do push para o GHCR.
 
-### 1. Code Quality Assurance (CI)
-*   **Trigger**: Fires on every `push` or `pull_request` to the `main` branch.
-*   **Environment**: Runs on `ubuntu-latest` with Node.js 20.
-*   **Linting**: Runs `npm run lint` (ESLint) to ensure code style consistency.
-*   **Deterministic Install**: Uses `npm ci` instead of `npm install` to ensure the exact dependency versions from `package-lock.json` are used.
-*   **Testing**: Executes `npm test` (Jest) to validate application logic. If tests fail, the pipeline stops immediately.
+### 3. Entrega progressiva (GitOps)
+Em vez de usar `kubectl apply`, a pipeline atualiza a versão da imagem no `k8s/base/kustomization.yaml`.
+O **ArgoCD** detecta essa mudança e o **Argo Rollouts** assume o controle:
+1.  Inicia o novo set de Pods.
+2.  Redireciona 20% do tráfego.
+3.  Pausa por 1 minuto para observação.
+4.  Aumenta para 50%, depois 100%.
 
-### 2. Security Scanning (Sec)
-Before building artifacts, we scan the codebase to prevent vulnerabilities from entering the supply chain.
-*   **Filesystem Vulnerability Scan**: Uses **Trivy** to scan the repository files (`package.json`, `package-lock.json`, etc.) for known CVEs.
-*   **Policy**: The pipeline is configured to **fail** if `CRITICAL` or `HIGH` severity vulnerabilities are found.
-
-### 3. Artifact Build & Optimization
-*   **Multi-Stage Dockerfile**:
-    *   **Stage 1 (Builder)**: Installs full dependencies to support the build process.
-    *   **Stage 2 (Production)**: Copies only the production `node_modules` and source code. Base image is `node:20-alpine` (lightweight/reduced attack surface).
-*   **Container Security**:
-    *   **Non-Root User**: The application explicitly switches to the `node` user (UID 1000). It does *not* run as root.
-    *   **PID 1 Handling**: Uses `dumb-init` to correctly handle kernel signals (SIGTERM/SIGINT) for graceful shutdowns.
-*   **Image Scanning**: Once the image is built, **Trivy** scans the final Docker image layers for OS-level vulnerabilities (e.g., outdated Alpine packages).
-
-### 4. GitOps Delivery (CD)
-We do not use `kubectl` in the CI pipeline (Push-based). We use **ArgoCD** (Pull-based).
-1.  **Image Push**: The verified Docker image is pushed to **GitHub Container Registry (GHCR)**.
-2.  **Manifest Update**: The CI pipeline uses `sed` to edit `k8s/deployment.yaml`. It replaces the image tag with the new Docker image SHA (e.g., `ghcr.io/...:sha-12345`).
-3.  **Git Commit**: The CI pipeline commits this change and pushes it back to the `main` branch.
-4.  **ArgoCD Sync**:
-    *   ArgoCD (running inside K8s) polls the Git repository.
-    *   It detects the change in `k8s/deployment.yaml`.
-    *   It diffs the desired state (Git) vs. live state (Cluster).
-    *   It automatically applies the new Deployment, triggering a rolling update in Kubernetes.
+Isso garante que, se houver um erro crítico, o impacto seja minimizado e o rollback seja imediato.

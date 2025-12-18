@@ -1,11 +1,11 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
 metadata:
   name: node-k8s-app
   labels:
     app: node-k8s-app
 spec:
-  replicas: 2
+  replicas: 4
   selector:
     matchLabels:
       app: node-k8s-app
@@ -24,7 +24,7 @@ spec:
         fsGroup: 2000
       containers:
         - name: node-app
-          image: ghcr.io/alessandrosangalli/node-k8s-cicd-pipeline:27f94d5e4a09ff0a2a42ae2de62d63145f2f80bd
+          image: ghcr.io/alessandrosangalli/node-k8s-cicd-pipeline:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
@@ -50,3 +50,11 @@ spec:
           env:
             - name: NODE_ENV
               value: "production"
+  strategy:
+    canary:
+      steps:
+        - setWeight: 20
+        - pause: {duration: 1m} # Pausa para observar métricas
+        - setWeight: 50
+        - pause: {duration: 1m}
+        - setWeight: 100
