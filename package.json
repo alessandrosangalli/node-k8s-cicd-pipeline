@@ -24,9 +24,5 @@
   },
   "engines": {
     "node": ">=18.0.0"
-  },
-  "overrides": {
-    "cross-spawn": "^7.0.6",
-    "glob": "^10.4.5"
   }
 }
