@@ -88,16 +88,37 @@ kubectl apply -f k8s/
 
 3.  Access ArgoCD UI and watch the magic happen.
 
-## 🔄 CI/CD Pipeline Flow
+## ⚙️ Pipeline Architecture & Workflow (Deep Dive)
 
-1.  **Code Push**: Developer pushes to `main`.
-2.  **CI (GitHub Actions)**:
-    *   Runs `npm install` & `npm test`.
-    *   Runs **Trivy** to scan code for vulnerabilities.
-    *   Builds Docker Image.
-    *   Runs **Trivy** to scan the *Image* for OS-level vulnerabilities.
-    *   Pushes image to GitHub Container Registry (GHCR).
-    *   *GitOps Hook*: Updates `k8s/deployment.yaml` with the new image tag and commits it back to the repo.
-3.  **CD (ArgoCD)**:
-    *   Detects the change in the git repository.
-    *   Syncs the cluster state to match the new manifest.
+This project implements a fully automated **DevSecOps** pipeline. Below is the exact step-by-step process that occurs on every code change.
+
+### 1. Code Quality Assurance (CI)
+*   **Trigger**: Fires on every `push` or `pull_request` to the `main` branch.
+*   **Environment**: Runs on `ubuntu-latest` with Node.js 18.
+*   **Deterministic Install**: Uses `npm ci` instead of `npm install` to ensure the exact dependency versions from `package-lock.json` are used.
+*   **Testing**: Executes `npm test` (Jest) to validate application logic. If tests fail, the pipeline stops immediately.
+
+### 2. Security Scanning (Sec)
+Before building artifacts, we scan the codebase to prevent vulnerabilities from entering the supply chain.
+*   **Filesystem Vulnerability Scan**: Uses **Trivy** to scan the repository files (`package.json`, `package-lock.json`, etc.) for known CVEs.
+*   **Policy**: The pipeline is configured to **fail** if `CRITICAL` or `HIGH` severity vulnerabilities are found.
+
+### 3. Artifact Build & Optimization
+*   **Multi-Stage Dockerfile**:
+    *   **Stage 1 (Builder)**: Installs full dependencies to support the build process.
+    *   **Stage 2 (Production)**: Copies only the `dist` or production `node_modules`. Base image is `node:18-alpine` (lightweight/reduced attack surface).
+*   **Container Security**:
+    *   **Non-Root User**: The application explicitly switches to the `node` user (UID 1000). It does *not* run as root.
+    *   **PID 1 Handling**: Uses `dumb-init` to correctly handle kernel signals (SIGTERM/SIGINT) for graceful shutdowns.
+*   **Image Scanning**: Once the image is built, **Trivy** scans the final Docker image layers for OS-level vulnerabilities (e.g., outdated Alpine packages).
+
+### 4. GitOps Delivery (CD)
+We do not use `kubectl` in the CI pipeline (Push-based). We use **ArgoCD** (Pull-based).
+1.  **Image Push**: The verified Docker image is pushed to **GitHub Container Registry (GHCR)**.
+2.  **Manifest Update**: The CI pipeline uses `sed` to edit `k8s/deployment.yaml`. It replaces the image tag with the new Docker image SHA (e.g., `ghcr.io/...:sha-12345`).
+3.  **Git Commit**: The CI pipeline commits this change and pushes it back to the `main` branch.
+4.  **ArgoCD Sync**:
+    *   ArgoCD (running inside K8s) polls the Git repository.
+    *   It detects the change in `k8s/deployment.yaml`.
+    *   It diffs the desired state (Git) vs. live state (Cluster).
+    *   It automatically applies the new Deployment, triggering a rolling update in Kubernetes.
