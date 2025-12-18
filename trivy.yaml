@@ -1,0 +1,7 @@
+timeout: 10m
+format: table
+exit-code: 0
+severity:
+  - HIGH
+  - CRITICAL
+ignore-unfixed: true
