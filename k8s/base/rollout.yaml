@@ -26,7 +26,7 @@ spec:
         - key: "instance_type"
           operator: "Equal"
           value: "spot"
-          effect: "NO_SCHEDULE"
+          effect: "NoSchedule"
       containers:
         - name: node-app
           image: ghcr.io/alessandrosangalli/node-k8s-cicd-pipeline:latest

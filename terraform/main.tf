@@ -137,7 +137,7 @@ resource "helm_release" "argocd" {
   }
   set {
     name  = "global.tolerations[0].effect"
-    value = "NO_SCHEDULE"
+    value = "NoSchedule"
   }
 
   # Estado da Arte: Injetando a aplicação via Helm
@@ -202,7 +202,7 @@ resource "helm_release" "argo_rollouts" {
   }
   set {
     name  = "controller.tolerations[0].effect"
-    value = "NO_SCHEDULE"
+    value = "NoSchedule"
   }
 
   depends_on = [google_container_node_pool.spot_nodes]
