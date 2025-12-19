@@ -37,6 +37,17 @@ provider "helm" {
   }
 }
 
+# Habilitar APIs necessárias no GCP
+resource "google_project_service" "compute" {
+  service                    = "compute.googleapis.com"
+  disable_on_destroy         = false
+}
+
+resource "google_project_service" "container" {
+  service                    = "container.googleapis.com"
+  disable_on_destroy         = false
+}
+
 # Cluster GKE Standard
 resource "google_container_cluster" "primary" {
   name     = "node-k8s-cluster"
@@ -49,6 +60,12 @@ resource "google_container_cluster" "primary" {
   subnetwork = "default"
 
   deletion_protection = false
+
+  # Garante que as APIs estejam prontas antes de criar o cluster
+  depends_on = [
+    google_project_service.compute,
+    google_project_service.container
+  ]
 }
 
 # Node Pool Econômico (SPOT)
