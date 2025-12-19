@@ -116,13 +116,15 @@ resource "helm_release" "argocd" {
   namespace        = "argocd"
   create_namespace = true
   version          = "5.46.7"
+  timeout          = 900   # 15 minutos
+  wait             = false # Não trava a pipeline esperando todos os pods subirem
+  cleanup_on_fail  = true
 
   set {
     name  = "server.service.type"
     value = "LoadBalancer"
   }
 
-  # Permitir que o ArgoCD rode nas instâncias Spot
   set {
     name  = "global.tolerations[0].key"
     value = "instance_type"
@@ -140,7 +142,6 @@ resource "helm_release" "argocd" {
     value = "NoSchedule"
   }
 
-  # Estado da Arte: Injetando a aplicação via Helm
   values = [
     yamlencode({
       server = {
@@ -181,13 +182,15 @@ resource "helm_release" "argo_rollouts" {
   chart            = "argo-rollouts"
   namespace        = "argo-rollouts"
   create_namespace = true
+  timeout          = 900 # 15 minutos
+  wait             = false
+  cleanup_on_fail  = true
 
   set {
     name  = "dashboard.enabled"
     value = "true"
   }
 
-  # Permitir que o Argo Rollouts rode nas instâncias Spot
   set {
     name  = "controller.tolerations[0].key"
     value = "instance_type"
