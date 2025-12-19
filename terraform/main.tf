@@ -94,8 +94,39 @@ resource "helm_release" "argocd" {
 
   set {
     name  = "server.service.type"
-    value = "LoadBalancer" # Para você conseguir acessar a UI via IP público
+    value = "LoadBalancer"
   }
+
+  # Estado da Arte: Injetando a aplicação via Helm para evitar erro de conexão no Plan
+  values = [
+    yamlencode({
+      server = {
+        additionalApplications = [
+          {
+            name      = "node-k8s-app"
+            namespace = "argocd"
+            project   = "default"
+            source = {
+              repoURL        = "https://github.com/${var.github_repo}.git"
+              targetRevision = "HEAD"
+              path           = "k8s/overlays/production"
+            }
+            destination = {
+              server    = "https://kubernetes.default.svc"
+              namespace = "default"
+            }
+            syncPolicy = {
+              automated = {
+                prune    = true
+                selfHeal = true
+              }
+              syncOptions = ["CreateNamespace=true"]
+            }
+          }
+        ]
+      }
+    })
+  ]
   
   depends_on = [google_container_node_pool.spot_nodes]
 }
@@ -116,35 +147,11 @@ resource "helm_release" "argo_rollouts" {
   depends_on = [google_container_node_pool.spot_nodes]
 }
 
-# 3. Bootstrapping: Criar a aplicação no ArgoCD automaticamente
-resource "kubernetes_manifest" "argocd_app" {
-  manifest = {
-    apiVersion = "argoproj.io/v1alpha1"
-    kind       = "Application"
-    metadata = {
-      name      = "node-k8s-app"
-      namespace = "argocd"
-    }
-    spec = {
-      project = "default"
-      source = {
-        repoURL        = "https://github.com/${var.github_repo}.git"
-        targetRevision = "HEAD"
-        path           = "k8s/overlays/production"
-      }
-      destination = {
-        server    = "https://kubernetes.default.svc"
-        namespace = "default"
-      }
-      syncPolicy = {
-        automated = {
-          prune    = true
-          selfHeal = true
-        }
-        syncOptions = ["CreateNamespace=true"]
-      }
-    }
-  }
+output "kubernetes_cluster_name" {
+  value       = google_container_cluster.primary.name
+  description = "GKE Cluster Name"
+}
 
-  depends_on = [helm_release.argocd]
+output "argocd_server_host" {
+  value = "Aguarde alguns minutos e use 'kubectl get svc -n argocd argocd-server' para obter o IP"
 }
