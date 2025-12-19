@@ -22,6 +22,11 @@ spec:
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 2000
+      tolerations:
+        - key: "instance_type"
+          operator: "Equal"
+          value: "spot"
+          effect: "NO_SCHEDULE"
       containers:
         - name: node-app
           image: ghcr.io/alessandrosangalli/node-k8s-cicd-pipeline:latest
@@ -30,10 +35,10 @@ spec:
             - containerPort: 3000
           resources:
             requests:
-              memory: "64Mi"
-              cpu: "100m"
+              memory: "256Mi"
+              cpu: "250m"
             limits:
-              memory: "128Mi"
+              memory: "512Mi"
               cpu: "500m"
           livenessProbe:
             httpGet:
