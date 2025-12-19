@@ -38,14 +38,21 @@ provider "helm" {
 }
 
 # Habilitar APIs necessárias no GCP
+resource "google_project_service" "resourcemanager" {
+  service                    = "cloudresourcemanager.googleapis.com"
+  disable_on_destroy         = false
+}
+
 resource "google_project_service" "compute" {
   service                    = "compute.googleapis.com"
   disable_on_destroy         = false
+  depends_on                 = [google_project_service.resourcemanager]
 }
 
 resource "google_project_service" "container" {
   service                    = "container.googleapis.com"
   disable_on_destroy         = false
+  depends_on                 = [google_project_service.resourcemanager]
 }
 
 # Cluster GKE Standard
@@ -64,7 +71,8 @@ resource "google_container_cluster" "primary" {
   # Garante que as APIs estejam prontas antes de criar o cluster
   depends_on = [
     google_project_service.compute,
-    google_project_service.container
+    google_project_service.container,
+    google_project_service.resourcemanager
   ]
 }
 
