@@ -122,7 +122,25 @@ resource "helm_release" "argocd" {
     value = "LoadBalancer"
   }
 
-  # Estado da Arte: Injetando a aplicação via Helm para evitar erro de conexão no Plan
+  # Permitir que o ArgoCD rode nas instâncias Spot
+  set {
+    name  = "global.tolerations[0].key"
+    value = "instance_type"
+  }
+  set {
+    name  = "global.tolerations[0].operator"
+    value = "Equal"
+  }
+  set {
+    name  = "global.tolerations[0].value"
+    value = "spot"
+  }
+  set {
+    name  = "global.tolerations[0].effect"
+    value = "NO_SCHEDULE"
+  }
+
+  # Estado da Arte: Injetando a aplicação via Helm
   values = [
     yamlencode({
       server = {
@@ -167,6 +185,24 @@ resource "helm_release" "argo_rollouts" {
   set {
     name  = "dashboard.enabled"
     value = "true"
+  }
+
+  # Permitir que o Argo Rollouts rode nas instâncias Spot
+  set {
+    name  = "controller.tolerations[0].key"
+    value = "instance_type"
+  }
+  set {
+    name  = "controller.tolerations[0].operator"
+    value = "Equal"
+  }
+  set {
+    name  = "controller.tolerations[0].value"
+    value = "spot"
+  }
+  set {
+    name  = "controller.tolerations[0].effect"
+    value = "NO_SCHEDULE"
   }
 
   depends_on = [google_container_node_pool.spot_nodes]
