@@ -8,4 +8,4 @@ patches:
     patch: |-
       - op: replace
         path: /spec/replicas
-        value: 10 # Em produção queremos 10 replicas
+        value: 2 # Reduzido de 10 para 2 para caber no cluster econômico
