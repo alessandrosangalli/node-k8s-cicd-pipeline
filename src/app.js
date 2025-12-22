@@ -9,7 +9,6 @@ const app = express();
 app.use(helmet());
 app.use(cors());
 
-// Prometheus Metrics Setup
 const collectDefaultMetrics = promClient.collectDefaultMetrics;
 collectDefaultMetrics();
 
