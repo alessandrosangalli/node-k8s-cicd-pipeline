@@ -6,6 +6,7 @@ spec:
   metrics:
   - name: error-rate
     interval: 30s
+    count: 2
     # O deploy falha se houver mais de 5% de erro (exemplo didático)
     successCondition: result[0] < 0.05
     failureLimit: 1
