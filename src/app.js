@@ -20,7 +20,6 @@ const requestCounter = new promClient.Counter({
     labelNames: ['method', 'route', 'status'],
 });
 
-// Middleware to count requests
 app.use((req, res, next) => {
     res.on('finish', () => {
         requestCounter.inc({
