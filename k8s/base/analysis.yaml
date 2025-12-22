@@ -15,6 +15,6 @@ spec:
       prometheus:
         address: http://prometheus-server.monitoring.svc.cluster.local
         query: |
-          (sum(rate(http_requests_total{status=~"5.*", route="/health"}[1m])) or on() vector(0)) 
+          (sum(rate(http_requests_total{status=~"5.*"}[1m])) or on() vector(0)) 
           / 
-          (sum(rate(http_requests_total{route="/health"}[1m])) or on() vector(1)) 
+          (sum(rate(http_requests_total}[1m])) or on() vector(1)) 
