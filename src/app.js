@@ -6,7 +6,6 @@ const cors = require('cors');
 
 const app = express();
 
-// Security Middleware
 app.use(helmet());
 app.use(cors());
 
