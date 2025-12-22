@@ -12,7 +12,7 @@ spec:
     failureLimit: 1
     provider:
       prometheus:
-        address: http://prometheus-server.monitoring.svc.cluster.local:9090
+        address: http://prometheus-server.monitoring.svc.cluster.local
         query: |
           sum(rate(http_requests_total{status=~"5.*", route="/health"}[1m])) 
           / 
