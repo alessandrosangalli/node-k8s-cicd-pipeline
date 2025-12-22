@@ -17,4 +17,4 @@ spec:
         query: |
           (sum(rate(http_requests_total{status=~"5.*"}[1m])) or on() vector(0)) 
           / 
-          (sum(rate(http_requests_total}[1m])) or on() vector(1)) 
+          (sum(rate(http_requests_total[1m])) or on() vector(1))
