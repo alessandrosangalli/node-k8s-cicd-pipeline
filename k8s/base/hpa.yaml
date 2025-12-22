@@ -4,8 +4,8 @@ metadata:
   name: node-k8s-hpa
 spec:
   scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
+    apiVersion: argoproj.io/v1alpha1
+    kind: Rollout
     name: node-k8s-app
   minReplicas: 2
   maxReplicas: 10
