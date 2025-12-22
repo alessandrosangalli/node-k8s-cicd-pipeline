@@ -11,4 +11,4 @@ resources:
 images:
 - name: ghcr.io/alessandrosangalli/node-k8s-cicd-pipeline
   newName: ghcr.io/alessandrosangalli/node-k8s-cicd-pipeline
-  newTag: e0a15f77803d99570394eb2dd94aa41d671e8f5c
+  newTag: 4c15aebecd98b99b3c48e6195d6e94d7022b8da3
