@@ -219,6 +219,53 @@ resource "helm_release" "argo_rollouts" {
   depends_on = [google_container_node_pool.spot_nodes]
 }
 
+# 4. Instalar Prometheus via Helm (Otimizado)
+resource "helm_release" "prometheus" {
+  name             = "prometheus"
+  repository       = "https://prometheus-community.github.io/helm-charts"
+  chart            = "prometheus"
+  namespace        = "monitoring"
+  create_namespace = true
+  version          = "25.8.2"
+  wait             = false
+
+  # Desativar componentes pesados que não precisamos agora (AlertManager, PushGateway)
+  set {
+    name  = "alertmanager.enabled"
+    value = "false"
+  }
+  set {
+    name  = "pushgateway.enabled"
+    value = "false"
+  }
+
+  # Configurar persistência leve (ou desativar para economizar se quiser, mas mantemos 8GB)
+  set {
+    name  = "server.persistentVolume.size"
+    value = "8Gi"
+  }
+
+  # Permitir que o Prometheus rode nas instâncias Spot
+  set {
+    name  = "server.tolerations[0].key"
+    value = "instance_type"
+  }
+  set {
+    name  = "server.tolerations[0].operator"
+    value = "Equal"
+  }
+  set {
+    name  = "server.tolerations[0].value"
+    value = "spot"
+  }
+  set {
+    name  = "server.tolerations[0].effect"
+    value = "NoSchedule"
+  }
+
+  depends_on = [google_container_node_pool.spot_nodes]
+}
+
 output "kubernetes_cluster_name" {
   value       = google_container_cluster.primary.name
   description = "GKE Cluster Name"

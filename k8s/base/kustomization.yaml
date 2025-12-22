@@ -6,6 +6,7 @@ resources:
 - service.yaml
 - hpa.yaml
 - ingress.yaml
+- analysis.yaml
 
 images:
 - name: ghcr.io/alessandrosangalli/node-k8s-cicd-pipeline
