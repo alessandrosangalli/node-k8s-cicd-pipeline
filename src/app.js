@@ -37,7 +37,8 @@ app.get('/', (req, res) => {
 });
 
 app.get('/health', (req, res) => {
-    res.json({ status: 'UP', timestamp: new Date() });
+    // Simulando falha crítica para teste de Rollback Automático
+    res.status(500).json({ status: 'DOWN', error: 'Internal Server Error' });
 });
 
 // Metrics Endpoint for Prometheus to scrape
