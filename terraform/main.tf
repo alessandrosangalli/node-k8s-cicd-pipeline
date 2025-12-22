@@ -145,35 +145,49 @@ resource "helm_release" "argocd" {
   values = [
     yamlencode({
       server = {
-        additionalApplications = [
-          {
-            name      = "node-k8s-app"
-            namespace = "argocd"
-            project   = "default"
-            source = {
-              repoURL        = "https://github.com/${var.github_repo}.git"
-              targetRevision = "HEAD"
-              path           = "k8s/overlays/production"
-            }
-            destination = {
-              server    = "https://kubernetes.default.svc"
-              namespace = "default"
-            }
-            syncPolicy = {
-              automated = {
-                prune    = true
-                selfHeal = true
-              }
-              syncOptions = ["CreateNamespace=true"]
-            }
-          }
-        ]
+        service = {
+          type = "LoadBalancer"
+        }
       }
     })
   ]
   
   depends_on = [google_container_node_pool.spot_nodes]
 }
+
+# 3. Bootstrapping: Criar a aplicação no ArgoCD via Manifesto
+resource "kubernetes_manifest" "argocd_app" {
+  manifest = {
+    apiVersion = "argoproj.io/v1alpha1"
+    kind       = "Application"
+    metadata = {
+      name      = "node-k8s-app"
+      namespace = "argocd"
+    }
+    spec = {
+      project = "default"
+      source = {
+        repoURL        = "https://github.com/${var.github_repo}.git"
+        targetRevision = "HEAD"
+        path           = "k8s/overlays/production"
+      }
+      destination = {
+        server    = "https://kubernetes.default.svc"
+        namespace = "default"
+      }
+      syncPolicy = {
+        automated = {
+          prune    = true
+          selfHeal = true
+        }
+        syncOptions = ["CreateNamespace=true"]
+      }
+    }
+  }
+
+  depends_on = [helm_release.argocd]
+}
+
 
 # 2. Instalar Argo Rollouts via Helm
 resource "helm_release" "argo_rollouts" {
