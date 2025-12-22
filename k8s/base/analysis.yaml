@@ -3,18 +3,19 @@ kind: AnalysisTemplate
 metadata:
   name: success-rate-check
 spec:
+  args:
+  - name: pod_hash
   metrics:
   - name: error-rate
     interval: 30s
     count: 2
-    initialDelay: 1m # Dá tempo para o Prometheus coletar os primeiros segundos de tráfego
-    # O deploy falha se houver mais de 5% de erro (exemplo didático)
-    successCondition: result[0] <= 0.01  # Alterado para ser extremamente rigoroso (<1%)
+    initialDelay: 1m
+    successCondition: result[0] <= 0.01
     failureLimit: 1
     provider:
       prometheus:
         address: http://prometheus-server.monitoring.svc.cluster.local
         query: |
-          (sum(rate(http_requests_total{status=~"5.*", rollouts_pod_template_hash="{{args.canary-hash}}"}[1m])) or on() vector(0))
+          (sum(rate(http_requests_total{status=~"5.*", rollouts_pod_template_hash="{{args.pod_hash}}"}[1m])) or on() vector(0))
           /
-          (sum(rate(http_requests_total{rollouts_pod_template_hash="{{args.canary-hash}}"}[1m])) or on() vector(1))
+          (sum(rate(http_requests_total{rollouts_pod_template_hash="{{args.pod_hash}}"}[1m])) or on() vector(1))
