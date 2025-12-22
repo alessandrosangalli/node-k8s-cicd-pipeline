@@ -41,7 +41,6 @@ app.get('/health', (req, res) => {
     res.status(500).json({ status: 'DOWN', error: 'Internal Server Error' });
 });
 
-// Metrics Endpoint for Prometheus to scrape
 app.get('/metrics', async (req, res) => {
     res.set('Content-Type', promClient.register.contentType);
     res.end(await promClient.register.metrics());
