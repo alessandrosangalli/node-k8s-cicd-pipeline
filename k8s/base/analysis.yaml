@@ -7,6 +7,7 @@ spec:
   - name: error-rate
     interval: 30s
     count: 2
+    initialDelay: 1m # Dá tempo para o Prometheus coletar os primeiros segundos de tráfego
     # O deploy falha se houver mais de 5% de erro (exemplo didático)
     successCondition: result[0] < 0.05
     failureLimit: 1
@@ -14,6 +15,6 @@ spec:
       prometheus:
         address: http://prometheus-server.monitoring.svc.cluster.local
         query: |
-          sum(rate(http_requests_total{status=~"5.*", route="/health"}[1m])) 
+          (sum(rate(http_requests_total{status=~"5.*", route="/health"}[1m])) or on() vector(0)) 
           / 
-          sum(rate(http_requests_total{route="/health"}[1m]))
+          (sum(rate(http_requests_total{route="/health"}[1m])) or on() vector(1)) 
