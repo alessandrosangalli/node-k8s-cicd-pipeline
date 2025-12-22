@@ -96,12 +96,6 @@ resource "google_container_node_pool" "spot_nodes" {
       role = "general"
     }
 
-    taint {
-      key    = "instance_type"
-      value  = "spot"
-      effect = "NO_SCHEDULE"
-    }
-
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"
     ]
