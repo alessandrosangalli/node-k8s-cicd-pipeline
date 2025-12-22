@@ -32,7 +32,7 @@ app.use((req, res, next) => {
 
 app.get('/', (req, res) => {
     logger.info('Root endpoint called');
-    res.json({ message: 'Hello from the Gold Standard Pipeline. Success simulation', version: '1.0.0' });
+    res.json({ message: 'Hello from the Gold Standard Pipeline. Success simulation 2', version: '1.0.0' });
 });
 
 app.get('/health', (req, res) => {

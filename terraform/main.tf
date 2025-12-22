@@ -176,6 +176,17 @@ resource "kubernetes_manifest" "argocd_app" {
         }
         syncOptions = ["CreateNamespace=true"]
       }
+      # Impedir que o ArgoCD atropele os passos do Canary do Argo Rollouts
+      ignoreDifferences = [
+        {
+          group = "argoproj.io"
+          kind  = "Rollout"
+          jsonPointers = [
+            "/spec/replicas", 
+            "/status"
+          ]
+        }
+      ]
     }
   }
 
