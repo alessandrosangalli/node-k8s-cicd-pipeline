@@ -1,10 +1,19 @@
+```yaml
 name: CI/CD Pipeline
 
 on:
   push:
     branches: [ "main" ]
+    paths-ignore:
+      - 'terraform/**'
+      - '.github/workflows/infra.yaml'
+      - '.github/workflows/destroy-infra.yaml'
   pull_request:
     branches: [ "main" ]
+    paths-ignore:
+      - 'terraform/**'
+      - '.github/workflows/infra.yaml'
+      - '.github/workflows/destroy-infra.yaml'
 
 env:
   REGISTRY: ghcr.io

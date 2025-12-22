@@ -149,51 +149,6 @@ resource "helm_release" "argocd" {
   depends_on = [google_container_node_pool.spot_nodes]
 }
 
-# 3. Bootstrapping: Criar a aplicação no ArgoCD via Manifesto
-resource "kubernetes_manifest" "argocd_app" {
-  manifest = {
-    apiVersion = "argoproj.io/v1alpha1"
-    kind       = "Application"
-    metadata = {
-      name      = "node-k8s-app"
-      namespace = "argocd"
-    }
-    spec = {
-      project = "default"
-      source = {
-        repoURL        = "https://github.com/${var.github_repo}.git"
-        targetRevision = "HEAD"
-        path           = "k8s/overlays/production"
-      }
-      destination = {
-        server    = "https://kubernetes.default.svc"
-        namespace = "default"
-      }
-      syncPolicy = {
-        automated = {
-          prune    = true
-          selfHeal = true
-        }
-        syncOptions = ["CreateNamespace=true"]
-      }
-      # Impedir que o ArgoCD atropele os passos do Canary do Argo Rollouts
-      ignoreDifferences = [
-        {
-          group = "argoproj.io"
-          kind  = "Rollout"
-          jsonPointers = [
-            "/spec/replicas", 
-            "/status"
-          ]
-        }
-      ]
-    }
-  }
-
-  depends_on = [helm_release.argocd]
-}
-
-
 # 2. Instalar Argo Rollouts via Helm
 resource "helm_release" "argo_rollouts" {
   name             = "argo-rollouts"
