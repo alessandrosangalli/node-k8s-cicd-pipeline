@@ -31,13 +31,13 @@ app.use((req, res, next) => {
 });
 
 app.get('/', (req, res) => {
-    logger.info('Root endpoint called');
-    res.json({ message: 'Hello from the Gold Standard Pipeline. Eroor simulation', version: '1.0.0' });
+    logger.info('Root endpoint called - Simulating Failure');
+    // Simulando falha na lógica de negócio, mas mantendo o pod "Ready"
+    res.status(500).json({ error: 'Critical Business Logic Failure' });
 });
 
 app.get('/health', (req, res) => {
-    // Simulando falha crítica para teste de Rollback Automático
-    res.status(500).json({ status: 'DOWN', error: 'Internal Server Error' });
+    res.json({ status: 'UP', timestamp: new Date() });
 });
 
 app.get('/metrics', async (req, res) => {
