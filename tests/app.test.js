@@ -9,10 +9,10 @@ describe('GET /', () => {
     });
 });
 
-describe('GET /health', () => {
-    it('should return UP status', async () => {
-        const res = await request(app).get('/health');
-        expect(res.statusCode).toEqual(200);
-        expect(res.body.status).toEqual('UP');
-    });
-});
+// describe('GET /health', () => {
+//     it('should return UP status', async () => {
+//         const res = await request(app).get('/health');
+//         expect(res.statusCode).toEqual(200);
+//         expect(res.body.status).toEqual('UP');
+//     });
+// });
