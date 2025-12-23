@@ -32,14 +32,15 @@ app.use((req, res, next) => {
 
 app.get('/', (req, res) => {
     logger.info('Root endpoint called');
-    res.json({ message: 'Hello from the Gold Standard Pipeline. Success simulation 5', version: '1.0.0' });
+    res.json({ message: 'Hello from the Gold Standard Pipeline. Success simulation 6', version: '1.0.0' });
     // //teste
     // logger.info('Root endpoint called - Simulating Failure');
     // res.status(500).json({ error: 'Critical Business Logic Failure' });
 });
 
 app.get('/health', (req, res) => {
-    res.json({ status: 'UP', timestamp: new Date() });
+    //res.json({ status: 'UP', timestamp: new Date() });
+    res.status(500).json({ error: 'Critical Business Logic Failure' });
 });
 
 app.get('/metrics', async (req, res) => {
