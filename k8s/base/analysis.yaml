@@ -3,8 +3,6 @@ kind: AnalysisTemplate
 metadata:
   name: success-rate-check
 spec:
-  args:
-  - name: pod_hash
   metrics:
   - name: error-rate
     interval: 30s
