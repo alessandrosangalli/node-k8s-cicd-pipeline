@@ -103,3 +103,71 @@ O **ArgoCD** detecta essa mudança e o **Argo Rollouts** assume o controle:
 4.  Aumenta para 50%, depois 100%.
 
 Isso garante que, se houver um erro crítico, o impacto seja minimizado e o rollback seja imediato.
+
+---
+
+## 📖 Guia de Operação (Cloud Shell)
+
+Este guia contém os comandos essenciais para operar e monitorar o projeto diretamente do Google Cloud Shell.
+
+### 1. Acesso ao Cluster e IPs
+```bash
+# Conectar o kubectl ao seu cluster GKE
+gcloud container clusters get-credentials gke-node-k8s-cluster --region us-central1
+
+# Obter o IP externo da aplicação (Ingress)
+kubectl get ingress node-app-ingress
+```
+
+### 2. Gerenciamento do ArgoCD
+```bash
+# Obter a senha do usuário 'admin' para o primeiro acesso
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+
+# Obter o IP externo do painel do ArgoCD
+kubectl get svc -n argocd argocd-server
+```
+
+### 3. Operação de Rollouts (Canary)
+```bash
+# Instalar o plugin do Argo Rollouts no Cloud Shell (se não tiver)
+curl -LO https://github.com/argoproj/argo-rollouts/releases/latest/download/kubectl-argo-rollouts-linux-amd64
+chmod +x ./kubectl-argo-rollouts-linux-amd64
+sudo mv ./kubectl-argo-rollouts-linux-amd64 /usr/local/bin/kubectl-argo-rollouts
+
+# Ver o status do deploy em tempo real (Visão de Linha do Tempo)
+kubectl argo rollouts get rollout node-k8s-app -w
+
+# Abrir o Dashboard Visual (Clique em Web Preview -> Port 8080)
+kubectl argo rollouts dashboard
+
+# Comandos de Emergência
+kubectl argo rollouts retry rollout node-k8s-app   # Tentar novamente um deploy falho
+kubectl argo rollouts abort rollout node-k8s-app   # Cancelar deploy e voltar para estável
+kubectl argo rollouts promote rollout node-k8s-app # Pular steps e ir para 100% agora
+```
+
+### 4. Observabilidade (Prometheus)
+```bash
+# Abrir o painel do Prometheus (Web Preview -> Port 9090)
+kubectl port-forward -n monitoring deployment/prometheus-server 9090:9090
+
+# Testar se o Prometheus está coletando métricas (via terminal)
+curl -G 'http://prometheus-server.monitoring.svc.cluster.local/api/v1/query' \
+    --data-urlencode 'query=http_requests_total'
+```
+
+### 5. Manutenção e GitOps
+```bash
+# Aplicar mudanças de Bootstrap (GitOps Root App)
+kubectl apply -f argocd/bootstrap-app.yaml
+
+# Ver logs da aplicação em tempo real
+kubectl logs -f -l app=node-k8s-app --all-containers
+
+# Ver eventos de erro no cluster
+kubectl get events --sort-by='.lastTimestamp'
+```
+
+---
+*Este projeto é parte de um ecossistema de aprendizado em Engenharia de Plataforma e SRE.*
