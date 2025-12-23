@@ -15,7 +15,7 @@ spec:
         address: http://prometheus-server.monitoring.svc.cluster.local
         query: |
           max(
-            (sum by (rollouts_pod_template_hash) (rate(http_requests_total{status=~"5.*"}[2m])) or on() vector(0))
+            rate(http_requests_total{status=~"5.*"}[2m])
             /
-            (sum by (rollouts_pod_template_hash) (rate(http_requests_total[2m])) or on() vector(1))
+            rate(http_requests_total[2m])
           )
