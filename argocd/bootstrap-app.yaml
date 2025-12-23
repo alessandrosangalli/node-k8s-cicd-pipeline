@@ -20,6 +20,7 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
   ignoreDifferences:
     - group: argoproj.io
       kind: Rollout
