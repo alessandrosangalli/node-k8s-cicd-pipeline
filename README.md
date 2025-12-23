@@ -2,6 +2,22 @@
 
 Este projeto demonstra uma pipeline **DevSecOps** de nível profissional para um microserviço Node.js. Ele utiliza as ferramentas mais avançadas do mercado para criar uma arquitetura de deploy robusta, segura, escalável e com entrega progressiva.
 
+## 🚀 Testando o Canary Release (Prova de Fogo)
+
+Para verificar o "Self-Healing" da aplicação:
+
+1.  **Edite `src/app.js`**: Descomente as linhas que simulam erro 500 no endpoint `/`.
+2.  **Commit & Push**: Envie a mudança para o GitHub.
+    ```bash
+    git add .
+    git commit -m "feat: simulate failure"
+    git push
+    ```
+3.  **Acompanhe**:
+    *   No terminal: `kubectl argo rollouts get rollout node-k8s-app -w`
+    *   No Dashboard (Porta 8081): Veja o gráfico de erro subir.
+4.  **Resultado**: O Argo detectará a taxa de erro > 1% (nosso limite estrito) e abortará o deploy automaticamente!
+
 ## 🏆 Destaques do Projeto (Por que é "Estado da Arte"?)
 
 *   **Entrega Progressiva (Canary Deployments)**: Utiliza **Argo Rollouts** para gerenciar deploys graduais. Em vez de substituir tudo de uma vez, a nova versão recebe tráfego aos poucos (20%, 50%, 100%), permitindo validar a estabilidade antes da conclusão.
