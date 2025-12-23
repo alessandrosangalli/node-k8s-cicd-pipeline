@@ -4,6 +4,8 @@ metadata:
   name: node-k8s-service
   labels:
     app: node-k8s-app
+  annotations:
+    beta.cloud.google.com/backend-config: '{"default": "node-app-be-config"}'
 spec:
   selector:
     app: node-k8s-app
