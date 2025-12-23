@@ -6,11 +6,13 @@ metadata:
     app: node-k8s-app
   annotations:
     beta.cloud.google.com/backend-config: '{"default": "node-app-be-config"}'
+    cloud.google.com/neg: '{"ingress": true}'
 spec:
   selector:
     app: node-k8s-app
   ports:
-    - protocol: TCP
+    - name: http
+      protocol: TCP
       port: 80
       targetPort: 3000
   type: ClusterIP
