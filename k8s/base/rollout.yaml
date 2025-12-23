@@ -64,10 +64,6 @@ spec:
         - analysis:
             templates:
               - templateName: success-rate-check
-            args:
-              - name: canary-hash
-                valueFrom:
-                  podHashFromLabels: "rollouts-pod-template-hash"
         - setWeight: 50
         - pause: {duration: 1m}
         - setWeight: 100
