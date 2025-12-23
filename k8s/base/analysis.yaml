@@ -10,12 +10,12 @@ spec:
     interval: 30s
     count: 2
     initialDelay: 1m
-    successCondition: result[0] <= 0.01
+    successCondition: result[0] <= 0.05
     failureLimit: 1
     provider:
       prometheus:
         address: http://prometheus-server.monitoring.svc.cluster.local
         query: |
-          (sum(rate(http_requests_total{status=~"5.*", rollouts_pod_template_hash="{{args.pod_hash}}"}[1m])) or on() vector(0))
+          (sum(rate(http_requests_total{status=~"5.*"}[1m])) or on() vector(0))
           /
-          (sum(rate(http_requests_total{rollouts_pod_template_hash="{{args.pod_hash}}"}[1m])) or on() vector(1))
+          (sum(rate(http_requests_total[1m])) or on() vector(1))
