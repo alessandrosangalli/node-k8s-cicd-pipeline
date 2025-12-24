@@ -82,7 +82,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "prometheus-ds-uid"
               },
               "editorMode": "code",
               "expr": "sum(rate(http_requests_total[2m]))",
@@ -146,7 +146,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "prometheus-ds-uid"
               },
               "editorMode": "code",
               "expr": "sum(rate(http_requests_total{status=~\"5.*\"}[2m]))",
@@ -161,7 +161,7 @@ data:
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "${DS_PROMETHEUS}"
+            "uid": "prometheus-ds-uid"
           },
           "fieldConfig": {
             "defaults": {
@@ -234,7 +234,7 @@ data:
             {
               "datasource": {
                 "type": "prometheus",
-                "uid": "${DS_PROMETHEUS}"
+                "uid": "prometheus-ds-uid"
               },
               "editorMode": "code",
               "expr": "sum by (pod) (rate(http_requests_total[2m]))",
