@@ -14,7 +14,8 @@ resources:
 configMapGenerator:
 - files:
   - node-sre-dashboard.json
-  name: node-sre-dashboard
+  - node-sre-decision-grade-dashboard.json
+  name: node-exploratory-dashboard
 
 images:
 - name: ghcr.io/alessandrosangalli/node-k8s-cicd-pipeline
