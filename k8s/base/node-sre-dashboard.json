@@ -45,7 +45,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(http_requests_total{app=\"node-k8s-app\"}[5m])) or vector(0)",
+          "expr": "sum(rate(http_requests_total{app=\"node-k8s-app\"}[$__rate_interval])) or vector(0)",
           "legendFormat": "RPS Total",
           "range": true,
           "refId": "A"
@@ -96,7 +96,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "(sum(rate(http_requests_total{app=\"node-k8s-app\", status=~\"5.*\"}[5m])) or vector(0)) / (sum(rate(http_requests_total{app=\"node-k8s-app\"}[5m])) or vector(1)) * 100",
+          "expr": "(sum(rate(http_requests_total{app=\"node-k8s-app\", status=~\"5.*\"}[$__rate_interval])) or vector(0)) / (sum(rate(http_requests_total{app=\"node-k8s-app\"}[$__rate_interval])) or vector(1)) * 100",
           "range": true,
           "refId": "A"
         }
@@ -128,7 +128,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{app=\"node-k8s-app\"}[5m])) by (le)) or vector(0)",
+          "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{app=\"node-k8s-app\"}[$__rate_interval])) by (le)) or vector(0)",
           "legendFormat": "P99 Latency",
           "range": true,
           "refId": "A"
@@ -205,7 +205,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "rate(process_cpu_seconds_total{app=\"node-k8s-app\"}[5m]) * 100",
+          "expr": "rate(process_cpu_seconds_total{app=\"node-k8s-app\"}[$__rate_interval]) * 100",
           "legendFormat": "{{pod}}",
           "range": true,
           "refId": "A"
@@ -233,7 +233,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (pod) (rate(http_requests_total{app=\"node-k8s-app\"}[5m])) or vector(0)",
+          "expr": "sum by (pod) (rate(http_requests_total{app=\"node-k8s-app\"}[$__rate_interval])) or vector(0)",
           "legendFormat": "Pod: {{pod}}",
           "range": true,
           "refId": "A"
