@@ -27,6 +27,11 @@
         "x": 0,
         "y": 1
       },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "interval": "2m",
       "targets": [
         {
           "expr": "sum(rate(http_requests_total{namespace=~\"$namespace\", app=~\"$app\"}[$__rate_interval])) or vector(0)",
@@ -44,6 +49,11 @@
         "x": 8,
         "y": 1
       },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "interval": "2m",
       "targets": [
         {
           "expr": "100 * ((sum(rate(http_requests_total{namespace=~\"$namespace\", app=~\"$app\", status=~\"5..\"}[$__rate_interval])) or vector(0)) / (sum(rate(http_requests_total{namespace=~\"$namespace\", app=~\"$app\"}[$__rate_interval])) or vector(1)))",
@@ -61,6 +71,11 @@
         "x": 16,
         "y": 1
       },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "interval": "2m",
       "targets": [
         {
           "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{namespace=~\"$namespace\", app=~\"$app\"}[$__rate_interval])) by (le)) or vector(0)",
@@ -89,6 +104,10 @@
         "x": 0,
         "y": 9
       },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
       "targets": [
         {
           "expr": "process_resident_memory_bytes{namespace=~\"$namespace\", app=~\"$app\"}",
@@ -106,6 +125,11 @@
         "x": 8,
         "y": 9
       },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "interval": "2m",
       "targets": [
         {
           "expr": "rate(process_cpu_seconds_total{namespace=~\"$namespace\", app=~\"$app\"}[$__rate_interval]) * 100",
@@ -123,6 +147,11 @@
         "x": 16,
         "y": 9
       },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "interval": "2m",
       "targets": [
         {
           "expr": "sum by (pod)(rate(http_requests_total{namespace=~\"$namespace\", app=~\"$app\"}[$__rate_interval])) or vector(0)",

@@ -155,6 +155,17 @@ resource "helm_release" "prometheus" {
     value = "1Gi"
   }
 
+  values = [
+    yamlencode({
+      server = {
+        global = {
+          scrape_interval = "15s"
+          scrape_timeout  = "10s"
+        }
+      }
+    })
+  ]
+
   # Permitir que o Prometheus rode nas instâncias Spot
   depends_on = [google_container_cluster.primary]
 }
