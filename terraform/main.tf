@@ -67,12 +67,19 @@ resource "google_container_cluster" "primary" {
 
   deletion_protection = false
 
-  # Garante que as APIs estejam prontas antes de criar o cluster
   depends_on = [
     google_project_service.compute,
     google_project_service.container,
     google_project_service.resourcemanager
   ]
+}
+
+# Criar Namespace dedicado para a aplicação (SRE Best Practice)
+resource "kubernetes_namespace" "node_app_ns" {
+  metadata {
+    name = "node-k8s-app"
+  }
+  depends_on = [google_container_cluster.primary]
 }
 
 # 1. Instalar ArgoCD via Helm
