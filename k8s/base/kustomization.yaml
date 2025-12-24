@@ -12,11 +12,11 @@ resources:
 - pdb.yaml
 
 configMapGenerator:
-- name: node-sre-dashboard
-  files:
+- files:
   - node-sre-dashboard.json
+  name: node-sre-dashboard
 
 images:
 - name: ghcr.io/alessandrosangalli/node-k8s-cicd-pipeline
   newName: ghcr.io/alessandrosangalli/node-k8s-cicd-pipeline
-  newTag: 26a89a33b4f3aaf37d1c1d6cbaae33b7e306c4f9
+  newTag: eba2c00a60ec5d4cdc3b414800f9ba67df2d0dcb
