@@ -8,25 +8,7 @@ metadata:
 data:
   node-app-dashboard.json: |
     {
-      "annotations": {
-        "list": [
-          {
-            "builtIn": 1,
-            "datasource": "-- Grafana --",
-            "enable": true,
-            "hide": true,
-            "iconColor": "rgba(0, 211, 255, 1)",
-            "name": "Annotations & Alerts",
-            "target": {
-              "limit": 100,
-              "matchAny": false,
-              "tags": [],
-              "type": "dashboard"
-            },
-            "type": "dashboard"
-          }
-        ]
-      },
+      "annotations": {},
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
@@ -35,235 +17,158 @@ data:
       "liveNow": false,
       "panels": [
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus-ds-uid"
-          },
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+          "id": 99,
+          "title": "🏆 Golden Signals (Business Health)",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
           "fieldConfig": {
             "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
+              "color": { "mode": "thresholds" },
+              "decimals": 2,
               "mappings": [],
+              "min": 0,
               "thresholds": {
                 "mode": "absolute",
                 "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  }
+                  { "color": "green", "value": null },
+                  { "color": "red", "value": 80 }
                 ]
               }
-            },
-            "overrides": []
+            }
           },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 0,
-            "y": 0
-          },
+          "gridPos": { "h": 6, "w": 6, "x": 0, "y": 1 },
           "id": 1,
           "options": {
-            "displayMode": "lcd",
-            "orientation": "horizontal",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showUnfilled": true,
-            "text": {}
+            "reduceOptions": { "calcs": ["lastNotNull"], "values": false },
+            "showUnfilled": true
           },
-          "pluginVersion": "8.3.3",
           "targets": [
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus-ds-uid"
-              },
-              "editorMode": "code",
+              "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
               "expr": "sum(rate(http_requests_total[2m]))",
-              "legendFormat": "Total RPS",
-              "range": true,
+              "legendFormat": "",
               "refId": "A"
             }
           ],
-          "title": "Requests Per Second (RPS)",
-          "type": "bargauge"
+          "title": "Throughput (RPS)",
+          "type": "stat"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus-ds-uid"
-          },
+          "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
           "fieldConfig": {
             "defaults": {
-              "color": {
-                "mode": "thresholds"
-              },
-              "mappings": [],
+              "color": { "mode": "thresholds" },
+              "max": 100,
+              "min": 0,
               "thresholds": {
                 "mode": "absolute",
                 "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 1
-                  }
+                  { "color": "green", "value": null },
+                  { "color": "red", "value": 1 }
                 ]
               },
-              "unit": "short"
-            },
-            "overrides": []
+              "unit": "percent"
+            }
           },
-          "gridPos": {
-            "h": 8,
-            "w": 12,
-            "x": 12,
-            "y": 0
-          },
+          "gridPos": { "h": 6, "w": 6, "x": 6, "y": 1 },
           "id": 2,
           "options": {
-            "orientation": "auto",
-            "reduceOptions": {
-              "calcs": [
-                "lastNotNull"
-              ],
-              "fields": "",
-              "values": false
-            },
-            "showThresholdLabels": false,
-            "showThresholdMarkers": true
+            "reduceOptions": { "calcs": ["mean"], "values": false },
+            "showUnfilled": true
           },
-          "pluginVersion": "8.3.3",
           "targets": [
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus-ds-uid"
-              },
-              "editorMode": "code",
-              "expr": "sum(rate(http_requests_total{status=~\"5.*\"}[2m]))",
-              "legendFormat": "Errors (5xx)",
-              "range": true,
+              "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
+              "expr": "(sum(rate(http_requests_total{status=~\"5.*\"}[2m])) or vector(0)) / (sum(rate(http_requests_total[2m])) or vector(1)) * 100",
+              "legendFormat": "",
               "refId": "A"
             }
           ],
-          "title": "Error Rate (5xx)",
-          "type": "gauge"
+          "title": "Error Rate (%)",
+          "type": "stat"
         },
         {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus-ds-uid"
-          },
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 10,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "linear",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  }
-                ]
-              }
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 9,
-            "w": 24,
-            "x": 0,
-            "y": 8
-          },
-          "id": 4,
+          "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
+          "gridPos": { "h": 6, "w": 12, "x": 12, "y": 1 },
+          "id": 3,
+          "title": "Traffic Split (Canary vs Stable)",
+          "type": "timeseries",
           "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
+             "legend": { "displayMode": "table", "placement": "right" }
           },
           "targets": [
             {
-              "datasource": {
-                "type": "prometheus",
-                "uid": "prometheus-ds-uid"
-              },
-              "editorMode": "code",
-              "expr": "sum by (pod) (rate(http_requests_total[2m]))",
-              "legendFormat": "{{pod}}",
-              "range": true,
+              "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
+              "expr": "sum by (rollouts_pod_template_hash) (rate(http_requests_total[2m]))",
+              "legendFormat": "Hash: {{rollouts_pod_template_hash}}",
               "refId": "A"
             }
-          ],
-          "title": "Traffic Distribution per Pod (Canary vs Stable)",
-          "type": "timeseries"
+          ]
+        },
+        {
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 7 },
+          "id": 100,
+          "title": "🧪 Infrastructure Saturation (Node.js Internals)",
+          "type": "row"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
+          "fieldConfig": { "defaults": { "unit": "bytes" } },
+          "gridPos": { "h": 6, "w": 8, "x": 0, "y": 8 },
+          "id": 4,
+          "title": "Memory Usage (RSS)",
+          "type": "timeseries",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
+              "expr": "process_resident_memory_bytes",
+              "legendFormat": "{{pod}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
+          "fieldConfig": { "defaults": { "unit": "percent" } },
+          "gridPos": { "h": 6, "w": 8, "x": 8, "y": 8 },
+          "id": 5,
+          "title": "CPU Usage (Throttle Risk)",
+          "type": "timeseries",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
+              "expr": "rate(process_cpu_seconds_total[2m]) * 100",
+              "legendFormat": "{{pod}}",
+              "refId": "A"
+            }
+          ]
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
+          "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 0.1 }] }, "unit": "s" } },
+          "gridPos": { "h": 6, "w": 8, "x": 16, "y": 8 },
+          "id": 6,
+          "title": "Event Loop Lag (Latency Proxy)",
+          "type": "stat",
+          "targets": [
+            {
+              "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
+              "expr": "nodejs_eventloop_lag_seconds",
+              "legendFormat": "{{pod}}",
+              "refId": "A"
+            }
+          ]
         }
       ],
       "schemaVersion": 34,
       "style": "dark",
-      "tags": [
-        "nodejs",
-        "k8s"
-      ],
-      "templating": {
-        "list": []
-      },
-      "time": {
-        "from": "now-6h",
-        "to": "now"
-      },
-      "timepicker": {},
-      "timezone": "",
-      "title": "Node.js App - Golden Signals",
-      "uid": "node-app-golden-signals",
-      "version": 1,
-      "weekStart": ""
+      "tags": ["nodejs", "k8s", "sre"],
+      "templating": { "list": [] },
+      "time": { "from": "now-6h", "to": "now" },
+      "title": "Node.js Professional SRE Dashboard",
+      "uid": "node-app-sre-pro",
+      "version": 1
     }
