@@ -101,7 +101,7 @@ kubectl kustomize k8s/overlays/production
 1.  Crie o namespace e instale o ArgoCD no seu cluster.
 2.  Aplique o manifesto da aplicação:
     ```bash
-    kubectl apply -f argocd/application.yaml
+    kubectl apply -f argocd/bootstrap.yaml
     ```
 
 ## ⚙️ Arquitetura da Pipeline (Deep Dive)
@@ -143,6 +143,9 @@ kubectl get ingress node-app-ingress
 
 ### 2. Gerenciamento do ArgoCD
 ```bash
+# Obter a senha inicial do admin (Comando universal Windows/Linux)
+kubectl -n argocd get secret argocd-initial-admin-secret -o go-template="{{index .data \"password\" | base64decode}}"; echo
+
 # Obter o acesso ao ArgoCD (Via Port-Forward - Segurança & Economia)
 # Não expomos ferramentas sensíveis via IP público por boas práticas de segurança e FinOps.
 kubectl port-forward -n argocd svc/argocd-server 8080:443
@@ -181,7 +184,7 @@ curl -G 'http://prometheus-server.monitoring.svc.cluster.local/api/v1/query' \
 ### 5. Manutenção e GitOps
 ```bash
 # Aplicar mudanças de Bootstrap (GitOps Root App)
-kubectl apply -f argocd/bootstrap-app.yaml
+kubectl apply -f argocd/bootstrap.yaml
 
 # Ver logs da aplicação em tempo real
 kubectl logs -f -l app=node-k8s-app --all-containers
