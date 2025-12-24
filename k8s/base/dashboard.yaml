@@ -29,34 +29,31 @@ data:
       "liveNow": false,
       "panels": [
         {
-          "collapsed": false,
           "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
           "id": 99,
-          "panels": [],
           "title": "🏆 Golden Signals (User Experience & Business Health)",
           "type": "row"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
           "fieldConfig": {
             "defaults": {
               "color": { "mode": "palette-classic" },
-              "custom": { "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "auto", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" } },
-              "mappings": [],
+              "decimals": 2,
+              "min": 0,
               "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
-            },
-            "overrides": []
+            }
           },
-          "gridPos": { "h": 8, "w": 8, "x": 0, "y": 1 },
+          "gridPos": { "h": 7, "w": 8, "x": 0, "y": 1 },
           "id": 1,
           "options": {
-            "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true },
+            "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
             "tooltip": { "mode": "single", "sort": "none" }
           },
           "targets": [
             {
-              "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum(rate(http_requests_total{namespace=\"$namespace\", job=\"$job\"}[2m]))",
+              "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
+              "expr": "sum(rate(http_requests_total{kubernetes_namespace=\"$namespace\", app=\"$app\"}[2m]))",
               "legendFormat": "Total RPS",
               "refId": "A"
             }
@@ -65,11 +62,10 @@ data:
           "type": "timeseries"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
           "fieldConfig": {
             "defaults": {
               "color": { "mode": "thresholds" },
-              "mappings": [],
               "max": 100,
               "min": 0,
               "thresholds": {
@@ -83,53 +79,43 @@ data:
               "unit": "percent"
             }
           },
-          "gridPos": { "h": 8, "w": 8, "x": 8, "y": 1 },
+          "gridPos": { "h": 7, "w": 8, "x": 8, "y": 1 },
           "id": 2,
           "options": {
-            "orientation": "auto",
-            "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
-            "showUnfilled": true,
-            "text": {}
+            "reduceOptions": { "calcs": ["lastNotNull"], "values": false },
+            "showUnfilled": true
           },
           "targets": [
             {
-              "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "(sum(rate(http_requests_total{status=~\"5.*\", namespace=\"$namespace\", job=\"$job\"}[2m])) or vector(0)) / (sum(rate(http_requests_total{namespace=\"$namespace\", job=\"$job\"}[2m])) or vector(1)) * 100",
-              "legendFormat": "Global Error Rate",
+              "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
+              "expr": "(sum(rate(http_requests_total{status=~\"5.*\", kubernetes_namespace=\"$namespace\", app=\"$app\"}[2m])) or vector(0)) / (sum(rate(http_requests_total{kubernetes_namespace=\"$namespace\", app=\"$app\"}[2m])) or vector(1)) * 100",
+              "legendFormat": "Error Rate",
               "refId": "A"
             }
           ],
-          "title": "Error Rate (%)",
+          "title": "Global Error Rate",
           "type": "gauge"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": {
-            "defaults": {
-              "color": { "mode": "palette-classic" },
-              "custom": { "axisCenteredZero": false, "axisColorMode": "text", "axisLabel": "", "axisPlacement": "auto", "barAlignment": 0, "drawStyle": "line", "fillOpacity": 10, "gradientMode": "none", "hideFrom": { "legend": false, "tooltip": false, "viz": false }, "lineInterpolation": "linear", "lineWidth": 1, "pointSize": 5, "scaleDistribution": { "type": "linear" }, "showPoints": "auto", "spanNulls": false, "stacking": { "group": "A", "mode": "none" }, "thresholdsStyle": { "mode": "off" }, "unit": "s" },
-              "mappings": [],
-              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
-            },
-            "overrides": []
-          },
-          "gridPos": { "h": 8, "w": 8, "x": 16, "y": 1 },
+          "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
+          "fieldConfig": { "defaults": { "unit": "s" } },
+          "gridPos": { "h": 7, "w": 8, "x": 16, "y": 1 },
           "id": 3,
           "options": {
-            "legend": { "calcs": [], "displayMode": "list", "placement": "bottom", "showLegend": true },
-            "tooltip": { "mode": "single", "sort": "none" }
+            "legend": { "displayMode": "list", "placement": "bottom" },
+            "tooltip": { "mode": "single" }
           },
           "targets": [
             {
-              "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{namespace=\"$namespace\", job=\"$job\"}[2m])) by (le))",
+              "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
+              "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{kubernetes_namespace=\"$namespace\", app=\"$app\"}[2m])) by (le))",
               "legendFormat": "P99 Latency",
               "refId": "A"
             },
             {
-              "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{namespace=\"$namespace\", job=\"$job\"}[2m])) by (le))",
-              "legendFormat": "P50 Latency (Median)",
+              "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
+              "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{kubernetes_namespace=\"$namespace\", app=\"$app\"}[2m])) by (le))",
+              "legendFormat": "P50 Latency",
               "refId": "B"
             }
           ],
@@ -137,131 +123,94 @@ data:
           "type": "timeseries"
         },
         {
-          "collapsed": false,
-          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 9 },
+          "gridPos": { "h": 1, "w": 24, "x": 0, "y": 8 },
           "id": 100,
-          "panels": [],
           "title": "🧪 Infrastructure & Node Internals (Canary Detection)",
           "type": "row"
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
           "fieldConfig": { "defaults": { "unit": "bytes" } },
-          "gridPos": { "h": 7, "w": 8, "x": 0, "y": 10 },
+          "gridPos": { "h": 7, "w": 8, "x": 0, "y": 9 },
           "id": 4,
           "title": "Memory Usage per Pod",
           "type": "timeseries",
           "targets": [
             {
-              "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "process_resident_memory_bytes{namespace=\"$namespace\", job=\"$job\"}",
-              "legendFormat": "{{pod}}",
+              "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
+              "expr": "process_resident_memory_bytes{kubernetes_namespace=\"$namespace\", app=\"$app\"}",
+              "legendFormat": "{{kubernetes_pod_name}}",
               "refId": "A"
             }
           ]
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
           "fieldConfig": { "defaults": { "unit": "percent" } },
-          "gridPos": { "h": 7, "w": 8, "x": 8, "y": 10 },
+          "gridPos": { "h": 7, "w": 8, "x": 8, "y": 9 },
           "id": 5,
           "title": "CPU Usage per Pod",
           "type": "timeseries",
           "targets": [
             {
-              "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "rate(process_cpu_seconds_total{namespace=\"$namespace\", job=\"$job\"}[2m]) * 100",
-              "legendFormat": "{{pod}}",
+              "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
+              "expr": "rate(process_cpu_seconds_total{kubernetes_namespace=\"$namespace\", app=\"$app\"}[2m]) * 100",
+              "legendFormat": "{{kubernetes_pod_name}}",
               "refId": "A"
             }
           ]
         },
         {
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 0.1 }] }, "unit": "s" } },
-          "gridPos": { "h": 7, "w": 8, "x": 16, "y": 10 },
+          "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
+          "gridPos": { "h": 7, "w": 8, "x": 16, "y": 9 },
           "id": 6,
-          "title": "Event Loop Lag per Pod",
+          "title": "Argo Rollouts Traffic Split",
           "type": "timeseries",
           "targets": [
             {
-              "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "nodejs_eventloop_lag_seconds{namespace=\"$namespace\", job=\"$job\"}",
-              "legendFormat": "{{pod}}",
-              "refId": "A"
-            }
-          ]
-        },
-        {
-          "datasource": { "type": "prometheus", "uid": "${datasource}" },
-          "gridPos": { "h": 6, "w": 24, "x": 0, "y": 17 },
-          "id": 7,
-          "title": "Argo Rollouts Traffic Split (Hash)",
-          "type": "timeseries",
-          "targets": [
-            {
-              "datasource": { "type": "prometheus", "uid": "${datasource}" },
-              "expr": "sum by (rollouts_pod_template_hash) (rate(http_requests_total{namespace=\"$namespace\", job=\"$job\"}[2m]))",
+              "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
+              "expr": "sum by (rollouts_pod_template_hash) (rate(http_requests_total{kubernetes_namespace=\"$namespace\", app=\"$app\"}[2m]))",
               "legendFormat": "Hash: {{rollouts_pod_template_hash}}",
               "refId": "A"
             }
           ]
         }
       ],
-      "refresh": "10s",
       "schemaVersion": 34,
       "style": "dark",
-      "tags": ["nodejs", "k8s", "sre", "argo"],
+      "tags": ["nodejs", "k8s", "sre"],
       "templating": {
         "list": [
           {
             "current": { "selected": false, "text": "prometheus", "value": "prometheus" },
-            "hide": 0,
-            "includeAll": false,
+            "hide": 2,
             "label": "Datasource",
-            "multi": false,
             "name": "datasource",
-            "options": [],
             "query": "prometheus",
-            "refresh": 1,
-            "regex": "",
-            "skipUrlSync": false,
             "type": "datasource"
           },
           {
-            "datasource": { "type": "prometheus", "uid": "${datasource}" },
-            "definition": "label_values(http_requests_total, namespace)",
-            "hide": 0,
-            "includeAll": false,
+            "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
+            "definition": "label_values(http_requests_total, kubernetes_namespace)",
             "label": "Namespace",
-            "multi": false,
             "name": "namespace",
-            "options": [],
-            "query": { "query": "label_values(http_requests_total, namespace)", "refId": "StandardVariableQuery" },
+            "query": { "query": "label_values(http_requests_total, kubernetes_namespace)", "refId": "StandardVariableQuery" },
             "refresh": 1,
-            "regex": "",
-            "sort": 0,
             "type": "query"
           },
           {
-            "datasource": { "type": "prometheus", "uid": "${datasource}" },
-            "definition": "label_values(http_requests_total{namespace='$namespace'}, job)",
-            "hide": 0,
-            "includeAll": false,
-            "label": "Job",
-            "multi": false,
-            "name": "job",
-            "options": [],
-            "query": { "query": "label_values(http_requests_total{namespace='$namespace'}, job)", "refId": "StandardVariableQuery" },
+            "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
+            "definition": "label_values(http_requests_total{kubernetes_namespace='$namespace'}, app)",
+            "label": "App",
+            "name": "app",
+            "query": { "query": "label_values(http_requests_total{kubernetes_namespace='$namespace'}, app)", "refId": "StandardVariableQuery" },
             "refresh": 1,
-            "regex": "",
-            "sort": 0,
             "type": "query"
           }
         ]
       },
       "time": { "from": "now-30m", "to": "now" },
-      "title": "Node.js SRE Pro (Argo Ready)",
-      "uid": "node-sre-pro",
-      "version": 2
+      "title": "Node.js SRE Professional (Confirmed)",
+      "uid": "node-sre-confirmed",
+      "version": 3
     }
