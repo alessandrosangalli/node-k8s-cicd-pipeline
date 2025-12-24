@@ -53,7 +53,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
-              "expr": "sum(rate(http_requests_total{kubernetes_namespace=\"$namespace\", app=\"$app\"}[2m]))",
+              "expr": "sum(rate(http_requests_total{namespace=\"$namespace\", app=\"$app\"}[2m]))",
               "legendFormat": "Total RPS",
               "refId": "A"
             }
@@ -88,7 +88,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
-              "expr": "(sum(rate(http_requests_total{status=~\"5.*\", kubernetes_namespace=\"$namespace\", app=\"$app\"}[2m])) or vector(0)) / (sum(rate(http_requests_total{kubernetes_namespace=\"$namespace\", app=\"$app\"}[2m])) or vector(1)) * 100",
+              "expr": "(sum(rate(http_requests_total{status=~\"5.*\", namespace=\"$namespace\", app=\"$app\"}[2m])) or vector(0)) / (sum(rate(http_requests_total{namespace=\"$namespace\", app=\"$app\"}[2m])) or vector(1)) * 100",
               "legendFormat": "Error Rate",
               "refId": "A"
             }
@@ -108,13 +108,13 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
-              "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{kubernetes_namespace=\"$namespace\", app=\"$app\"}[2m])) by (le))",
+              "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{namespace=\"$namespace\", app=\"$app\"}[2m])) by (le))",
               "legendFormat": "P99 Latency",
               "refId": "A"
             },
             {
               "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
-              "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{kubernetes_namespace=\"$namespace\", app=\"$app\"}[2m])) by (le))",
+              "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{namespace=\"$namespace\", app=\"$app\"}[2m])) by (le))",
               "legendFormat": "P50 Latency",
               "refId": "B"
             }
@@ -138,8 +138,8 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
-              "expr": "process_resident_memory_bytes{kubernetes_namespace=\"$namespace\", app=\"$app\"}",
-              "legendFormat": "{{kubernetes_pod_name}}",
+              "expr": "process_resident_memory_bytes{namespace=\"$namespace\", app=\"$app\"}",
+              "legendFormat": "{{pod}}",
               "refId": "A"
             }
           ]
@@ -154,8 +154,8 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
-              "expr": "rate(process_cpu_seconds_total{kubernetes_namespace=\"$namespace\", app=\"$app\"}[2m]) * 100",
-              "legendFormat": "{{kubernetes_pod_name}}",
+              "expr": "rate(process_cpu_seconds_total{namespace=\"$namespace\", app=\"$app\"}[2m]) * 100",
+              "legendFormat": "{{pod}}",
               "refId": "A"
             }
           ]
@@ -169,7 +169,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
-              "expr": "sum by (rollouts_pod_template_hash) (rate(http_requests_total{kubernetes_namespace=\"$namespace\", app=\"$app\"}[2m]))",
+              "expr": "sum by (rollouts_pod_template_hash) (rate(http_requests_total{namespace=\"$namespace\", app=\"$app\"}[2m]))",
               "legendFormat": "Hash: {{rollouts_pod_template_hash}}",
               "refId": "A"
             }
@@ -191,26 +191,26 @@ data:
           },
           {
             "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
-            "definition": "label_values(http_requests_total, kubernetes_namespace)",
+            "definition": "label_values(http_requests_total, namespace)",
             "label": "Namespace",
             "name": "namespace",
-            "query": { "query": "label_values(http_requests_total, kubernetes_namespace)", "refId": "StandardVariableQuery" },
+            "query": { "query": "label_values(http_requests_total, namespace)", "refId": "StandardVariableQuery" },
             "refresh": 1,
             "type": "query"
           },
           {
             "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
-            "definition": "label_values(http_requests_total{kubernetes_namespace='$namespace'}, app)",
+            "definition": "label_values(http_requests_total{namespace='$namespace'}, app)",
             "label": "App",
             "name": "app",
-            "query": { "query": "label_values(http_requests_total{kubernetes_namespace='$namespace'}, app)", "refId": "StandardVariableQuery" },
+            "query": { "query": "label_values(http_requests_total{namespace='$namespace'}, app)", "refId": "StandardVariableQuery" },
             "refresh": 1,
             "type": "query"
           }
         ]
       },
       "time": { "from": "now-30m", "to": "now" },
-      "title": "Node.js SRE Professional (Confirmed)",
-      "uid": "node-sre-confirmed",
-      "version": 3
+      "title": "Node.js SRE Pro (Verified Labels)",
+      "uid": "node-sre-verified-labels",
+      "version": 4
     }
