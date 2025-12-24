@@ -27,6 +27,9 @@ Para verificar o "Self-Healing" da aplicação:
     *   **Trivy**: Escaneamento automatizado de vulnerabilidades no sistema de arquivos e nas camadas da imagem Docker. A pipeline falha automaticamente se encontrar vulnerabilidades `CRITICAL` ou `HIGH`.
     *   **Usuário Não-Root**: O container roda estritamente com o usuário `node` (UID 1000), reduzindo a superfície de ataque.
     *   **Helmet.js**: Implementação de cabeçalhos de segurança HTTP.
+*   **Observabilidade como Código (Dashboards as Code)**:
+    *   **Grafana Automatizado**: O projeto provisiona automaticamente um dashboard Grafana (`k8s/base/dashboard.yaml`) via ConfigMap.
+    *   **Monitoramento Golden Signals**: Visualização imediata de RPS, Taxa de Erro e Distribuição de Tráfego entre Canary/Stable assim que o app sobe.
 *   **Observabilidade Avançada**:
     *   **Métricas Prometheus**: Endpoint `/metrics` nativo expondo uso de CPU, memória e contagem de requisições.
     *   **Logging Estruturado**: Utiliza `Winston` com formato JSON em produção (ideal para ELK/Datadog) e formato amigável com cores em desenvolvimento.
