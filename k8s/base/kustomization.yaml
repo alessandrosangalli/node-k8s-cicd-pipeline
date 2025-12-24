@@ -9,6 +9,7 @@ resources:
 - analysis.yaml
 - backend-config.yaml
 - dashboard.yaml
+- grafana.yaml
 
 images:
 - name: ghcr.io/alessandrosangalli/node-k8s-cicd-pipeline
