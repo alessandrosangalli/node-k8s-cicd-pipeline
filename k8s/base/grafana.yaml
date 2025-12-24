@@ -40,7 +40,7 @@ spec:
           name: grafana-dashboard-provider
       - name: dashboards
         configMap:
-          name: node-app-dashboard
+          name: node-sre-dashboard
 ---
 apiVersion: v1
 kind: Service

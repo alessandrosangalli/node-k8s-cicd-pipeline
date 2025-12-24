@@ -6,7 +6,7 @@ metadata:
     grafana_dashboard: "1"
     app: node-k8s-app
 data:
-  node-app-dashboard.json: |
+  node-sre-dashboard.json: |
     {
       "annotations": {
         "list": [
