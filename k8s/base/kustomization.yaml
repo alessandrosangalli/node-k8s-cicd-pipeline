@@ -8,9 +8,13 @@ resources:
 - ingress.yaml
 - analysis.yaml
 - backend-config.yaml
-- dashboard.yaml
 - grafana.yaml
 - pdb.yaml
+
+configMapGenerator:
+- name: node-sre-dashboard
+  files:
+  - node-sre-dashboard.json
 
 images:
 - name: ghcr.io/alessandrosangalli/node-k8s-cicd-pipeline
