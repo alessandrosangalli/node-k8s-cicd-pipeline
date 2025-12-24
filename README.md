@@ -34,6 +34,7 @@ Para verificar o "Self-Healing" da aplicação:
     *   **Métricas Prometheus**: Endpoint `/metrics` nativo expondo uso de CPU, memória e contagem de requisições.
     *   **Logging Estruturado**: Utiliza `Winston` com formato JSON em produção (ideal para ELK/Datadog) e formato amigável com cores em desenvolvimento.
 *   **Performance & Escalabilidade**:
+    *   **PDB (Pod Disruption Budget)**: Garante alta disponibilidade (min-available 50%) durante manutenções do cluster GKE (upgrades automáticos/drains), impedindo downtime.
     *   **HPA (Horizontal Pod Autoscaler)**: Escalabilidade automática baseada no uso de CPU.
     *   **Builds Multi-estágio**: Dockerfile otimizado para cache e tamanho reduzido da imagem final.
 
