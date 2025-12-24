@@ -12,7 +12,6 @@ app.use(cors());
 const collectDefaultMetrics = promClient.collectDefaultMetrics;
 collectDefaultMetrics();
 
-// Custom Metric
 const requestCounter = new promClient.Counter({
     name: 'http_requests_total',
     help: 'Total number of HTTP requests',
