@@ -19,9 +19,22 @@ const requestCounter = new promClient.Counter({
     labelNames: ['method', 'route', 'status'],
 });
 
+const httpRequestDurationMicroseconds = new promClient.Histogram({
+    name: 'http_request_duration_seconds',
+    help: 'Duration of HTTP requests in seconds',
+    labelNames: ['method', 'route', 'status'],
+    buckets: [0.1, 0.5, 1, 1.5, 2, 5],
+});
+
 app.use((req, res, next) => {
+    const end = httpRequestDurationMicroseconds.startTimer();
     res.on('finish', () => {
         requestCounter.inc({
+            method: req.method,
+            route: req.path,
+            status: res.statusCode,
+        });
+        end({
             method: req.method,
             route: req.path,
             status: res.statusCode,

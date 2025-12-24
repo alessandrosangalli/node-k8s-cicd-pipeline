@@ -1,0 +1,9 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: node-k8s-app-pdb
+spec:
+  minAvailable: 50%
+  selector:
+    matchLabels:
+      app: node-k8s-app
