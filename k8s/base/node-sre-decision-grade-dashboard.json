@@ -54,7 +54,7 @@
       },
       "targets": [
         {
-          "expr": "100 * ((sum(rate(http_requests_total{namespace=~\"$namespace\", app=~\"$app\", status=~\"5..\"}[2m])) or vector(0)) / (sum(rate(http_requests_total{namespace=~\"$namespace\", app=~\"$app\"}[2m])) or vector(1)))",
+          "expr": "100 * ((sum(rate(http_requests_total{namespace=~\"$namespace\", app=~\"$app\", route!=\"/health\", status=~\"5.*\"}[2m])) or vector(0)) / (sum(rate(http_requests_total{namespace=~\"$namespace\", app=~\"$app\", route!=\"/health\"}[2m])) or vector(1)))",
           "refId": "A"
         }
       ]

@@ -56,7 +56,7 @@
       "interval": "2m",
       "targets": [
         {
-          "expr": "100 * ((sum(rate(http_requests_total{namespace=~\"$namespace\", app=~\"$app\", status=~\"5..\"}[$__rate_interval])) or vector(0)) / (sum(rate(http_requests_total{namespace=~\"$namespace\", app=~\"$app\"}[$__rate_interval])) or vector(1)))",
+          "expr": "100 * ((sum(rate(http_requests_total{namespace=~\"$namespace\", app=~\"$app\", route!=\"/health\", status=~\"5.*\"}[$__rate_interval])) or vector(0)) / (sum(rate(http_requests_total{namespace=~\"$namespace\", app=~\"$app\", route!=\"/health\"}[$__rate_interval])) or vector(1)))",
           "refId": "A"
         }
       ]
@@ -78,7 +78,7 @@
       "interval": "2m",
       "targets": [
         {
-          "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{namespace=~\"$namespace\", app=~\"$app\"}[$__rate_interval])) by (le)) or vector(0)",
+          "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{namespace=~\"$namespace\", app=~\"$app\", route!=\"/health\"}[$__rate_interval])) by (le)) or vector(0)",
           "refId": "A"
         }
       ]
