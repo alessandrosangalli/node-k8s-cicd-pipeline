@@ -8,25 +8,10 @@ metadata:
 data:
   node-sre-dashboard.json: |
     {
-      "annotations": {
-        "list": [
-          {
-            "builtIn": 1,
-            "datasource": "-- Grafana --",
-            "enable": true,
-            "hide": true,
-            "iconColor": "rgba(0, 211, 255, 1)",
-            "name": "Annotations & Alerts",
-            "type": "dashboard"
-          }
-        ]
-      },
       "editable": true,
-      "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
       "id": null,
       "links": [],
-      "liveNow": false,
       "panels": [
         {
           "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
@@ -36,24 +21,13 @@ data:
         },
         {
           "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
-          "fieldConfig": {
-            "defaults": {
-              "color": { "mode": "palette-classic" },
-              "decimals": 2,
-              "min": 0,
-              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
-            }
-          },
+          "fieldConfig": { "defaults": { "decimals": 2, "min": 0 } },
           "gridPos": { "h": 7, "w": 8, "x": 0, "y": 1 },
           "id": 1,
-          "options": {
-            "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
-            "tooltip": { "mode": "single", "sort": "none" }
-          },
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
-              "expr": "sum(rate(http_requests_total{namespace=\"$namespace\", app=\"$app\"}[$__rate_interval]))",
+              "expr": "sum(rate(http_requests_total{namespace='$namespace', app='$app'}[5m]))",
               "legendFormat": "Total RPS",
               "refId": "A"
             }
@@ -68,27 +42,16 @@ data:
               "color": { "mode": "thresholds" },
               "max": 100,
               "min": 0,
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  { "color": "green", "value": null },
-                  { "color": "#EAB839", "value": 1 },
-                  { "color": "red", "value": 5 }
-                ]
-              },
+              "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] },
               "unit": "percent"
             }
           },
           "gridPos": { "h": 7, "w": 8, "x": 8, "y": 1 },
           "id": 2,
-          "options": {
-            "reduceOptions": { "calcs": ["lastNotNull"], "values": false },
-            "showUnfilled": true
-          },
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
-              "expr": "(sum(rate(http_requests_total{status=~\"5.*\", namespace=\"$namespace\", app=\"$app\"}[$__rate_interval])) or vector(0)) / (sum(rate(http_requests_total{namespace=\"$namespace\", app=\"$app\"}[$__rate_interval])) or vector(1)) * 100",
+              "expr": "(sum(rate(http_requests_total{status=~'5.*', namespace='$namespace', app='$app'}[5m])) or vector(0)) / (sum(rate(http_requests_total{namespace='$namespace', app='$app'}[5m])) or vector(1)) * 100",
               "legendFormat": "Error Rate",
               "refId": "A"
             }
@@ -101,31 +64,21 @@ data:
           "fieldConfig": { "defaults": { "unit": "s" } },
           "gridPos": { "h": 7, "w": 8, "x": 16, "y": 1 },
           "id": 3,
-          "options": {
-            "legend": { "displayMode": "list", "placement": "bottom" },
-            "tooltip": { "mode": "single" }
-          },
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
-              "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{namespace=\"$namespace\", app=\"$app\"}[$__rate_interval])) by (le))",
+              "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{namespace='$namespace', app='$app'}[5m])) by (le))",
               "legendFormat": "P99 Latency",
               "refId": "A"
-            },
-            {
-              "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
-              "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket{namespace=\"$namespace\", app=\"$app\"}[$__rate_interval])) by (le))",
-              "legendFormat": "P50 Latency",
-              "refId": "B"
             }
           ],
-          "title": "Latency (Response Time)",
+          "title": "Latency (P99)",
           "type": "timeseries"
         },
         {
           "gridPos": { "h": 1, "w": 24, "x": 0, "y": 8 },
           "id": 100,
-          "title": "🧪 Infrastructure & Node Internals (Canary Detection)",
+          "title": "🧪 Infrastructure & Node Internals",
           "type": "row"
         },
         {
@@ -138,7 +91,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
-              "expr": "process_resident_memory_bytes{namespace=\"$namespace\", app=\"$app\"}",
+              "expr": "process_resident_memory_bytes{namespace='$namespace', app='$app'}",
               "legendFormat": "{{pod}}",
               "refId": "A"
             }
@@ -154,7 +107,7 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
-              "expr": "rate(process_cpu_seconds_total{namespace=\"$namespace\", app=\"$app\"}[$__rate_interval]) * 100",
+              "expr": "rate(process_cpu_seconds_total{namespace='$namespace', app='$app'}[5m]) * 100",
               "legendFormat": "{{pod}}",
               "refId": "A"
             }
@@ -169,26 +122,19 @@ data:
           "targets": [
             {
               "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
-              "expr": "sum by (rollouts_pod_template_hash) (rate(http_requests_total{namespace=\"$namespace\", app=\"$app\"}[$__rate_interval]))",
+              "expr": "sum by (rollouts_pod_template_hash) (rate(http_requests_total{namespace='$namespace', app='$app'}[5m]))",
               "legendFormat": "Hash: {{rollouts_pod_template_hash}}",
               "refId": "A"
             }
           ]
         }
       ],
+      "refresh": "5s",
       "schemaVersion": 34,
       "style": "dark",
       "tags": ["nodejs", "k8s", "sre"],
       "templating": {
         "list": [
-          {
-            "current": { "selected": false, "text": "prometheus", "value": "prometheus" },
-            "hide": 2,
-            "label": "Datasource",
-            "name": "datasource",
-            "query": "prometheus",
-            "type": "datasource"
-          },
           {
             "datasource": { "type": "prometheus", "uid": "prometheus-ds-uid" },
             "definition": "label_values(http_requests_total, namespace)",
@@ -209,8 +155,8 @@ data:
           }
         ]
       },
-      "time": { "from": "now-30m", "to": "now" },
-      "title": "Node.js SRE Pro (Verified Labels)",
-      "uid": "node-sre-verified-labels",
-      "version": 4
+      "time": { "from": "now-15m", "to": "now" },
+      "title": "Node.js SRE Pro (Fixed Syntax)",
+      "uid": "node-sre-pro-final",
+      "version": 5
     }
