@@ -18,6 +18,18 @@ spec:
         prometheus.io/port: "3000"
         prometheus.io/path: "/metrics"
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - node-k8s-app
+                topologyKey: "kubernetes.io/hostname"
       securityContext:
         runAsUser: 1000
         runAsGroup: 1000

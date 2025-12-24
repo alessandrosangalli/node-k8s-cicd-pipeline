@@ -43,11 +43,11 @@ app.use((req, res, next) => {
 });
 
 app.get('/', (req, res) => {
-    // logger.info('Root endpoint called');
-    // res.json({ message: 'Hello from the Gold Standard Pipeline. Success simulation 8', version: '1.0.0' });
+    logger.info('Root endpoint called');
+    res.json({ message: 'Hello from the Gold Standard Pipeline. Success simulation 8', version: '1.0.0' });
     // //teste
-    logger.info('Root endpoint called - Simulating Failure');
-    res.status(500).json({ error: 'Critical Business Logic Failure' });
+    // logger.info('Root endpoint called - Simulating Failure');
+    // res.status(500).json({ error: 'Critical Business Logic Failure' });
 });
 
 app.get('/health', (req, res) => {
@@ -58,6 +58,15 @@ app.get('/health', (req, res) => {
 app.get('/metrics', async (req, res) => {
     res.set('Content-Type', promClient.register.contentType);
     res.end(await promClient.register.metrics());
+});
+
+// Global Error Handler
+app.use((err, req, res, next) => {
+    logger.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
+    res.status(err.status || 500).json({
+        error: 'Internal Server Error',
+        message: process.env.NODE_ENV === 'production' ? 'An unexpected error occurred' : err.message
+    });
 });
 
 module.exports = app;
