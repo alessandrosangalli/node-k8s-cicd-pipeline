@@ -40,7 +40,7 @@
       "id": 1,
       "targets": [
         {
-          "expr": "sum(rate(http_requests_total{namespace=~'$namespace', app=~'$app'}[$__rate_interval]))",
+          "expr": "sum(rate(http_requests_total{namespace=~\"$namespace\", app=~\"$app\"}[$__rate_interval]))",
           "legendFormat": "RPS Total",
           "refId": "A"
         }
@@ -85,7 +85,7 @@
       "id": 2,
       "targets": [
         {
-          "expr": "(sum(rate(http_requests_total{status=~'5.*', namespace=~'$namespace', app=~'$app'}[$__rate_interval])) or vector(0)) / (sum(rate(http_requests_total{namespace=~'$namespace', app=~'$app'}[$__rate_interval])) or vector(1)) * 100",
+          "expr": "(sum(rate(http_requests_total{status=~\"5.*\", namespace=~\"$namespace\", app=~\"$app\"}[$__rate_interval])) or vector(0)) / (sum(rate(http_requests_total{namespace=~\"$namespace\", app=~\"$app\"}[$__rate_interval])) or vector(1)) * 100",
           "refId": "A"
         }
       ],
@@ -111,7 +111,7 @@
       "id": 3,
       "targets": [
         {
-          "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{namespace=~'$namespace', app=~'$app'}[$__rate_interval])) by (le))",
+          "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{namespace=~\"$namespace\", app=~\"$app\"}[$__rate_interval])) by (le))",
           "legendFormat": "P99 Latency",
           "refId": "A"
         }
@@ -149,7 +149,7 @@
       "id": 4,
       "targets": [
         {
-          "expr": "process_resident_memory_bytes{namespace=~'$namespace', app=~'$app'}",
+          "expr": "process_resident_memory_bytes{namespace=~\"$namespace\", app=~\"$app\"}",
           "legendFormat": "{{pod}}",
           "refId": "A"
         }
@@ -176,7 +176,7 @@
       "id": 5,
       "targets": [
         {
-          "expr": "rate(process_cpu_seconds_total{namespace=~'$namespace', app=~'$app'}[$__rate_interval]) * 100",
+          "expr": "rate(process_cpu_seconds_total{namespace=~\"$namespace\", app=~\"$app\"}[$__rate_interval]) * 100",
           "legendFormat": "{{pod}}",
           "refId": "A"
         }
@@ -198,7 +198,7 @@
       "id": 6,
       "targets": [
         {
-          "expr": "sum by (rollouts_pod_template_hash) (rate(http_requests_total{namespace=~'$namespace', app=~'$app'}[$__rate_interval]))",
+          "expr": "sum by (rollouts_pod_template_hash) (rate(http_requests_total{namespace=~\"$namespace\", app=~\"$app\"}[$__rate_interval]))",
           "legendFormat": "Hash: {{rollouts_pod_template_hash}}",
           "refId": "A"
         }
@@ -217,37 +217,51 @@
   "templating": {
     "list": [
       {
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
         "datasource": {
           "type": "prometheus",
           "uid": "prometheus-ds-uid"
         },
         "definition": "label_values(up, namespace)",
+        "hide": 0,
         "includeAll": true,
         "label": "Namespace",
         "multi": true,
         "name": "namespace",
-        "query": {
-          "query": "label_values(up, namespace)",
-          "refId": "StandardVariableQuery"
-        },
+        "options": [],
+        "query": "label_values(up, namespace)",
         "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
         "type": "query"
       },
       {
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
         "datasource": {
           "type": "prometheus",
           "uid": "prometheus-ds-uid"
         },
-        "definition": "label_values(up{namespace=~'$namespace'}, app)",
+        "definition": "label_values(up{namespace=~\"$namespace\"}, app)",
+        "hide": 0,
         "includeAll": true,
         "label": "App",
         "multi": true,
         "name": "app",
-        "query": {
-          "query": "label_values(up{namespace=~'$namespace'}, app)",
-          "refId": "StandardVariableQuery"
-        },
+        "options": [],
+        "query": "label_values(up{namespace=~\"$namespace\"}, app)",
         "refresh": 1,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
         "type": "query"
       }
     ]
@@ -258,5 +272,5 @@
   },
   "title": "Node.js SRE Pro (Gold Standard)",
   "uid": "node-sre-gold-standard",
-  "version": 14
+  "version": 15
 }

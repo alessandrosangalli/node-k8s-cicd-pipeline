@@ -67,6 +67,9 @@ data:
       url: http://prometheus-server.monitoring.svc.cluster.local
       access: proxy
       isDefault: true
+      jsonData:
+        httpMethod: POST
+        scrapeInterval: 1m
 ---
 apiVersion: v1
 kind: ConfigMap
