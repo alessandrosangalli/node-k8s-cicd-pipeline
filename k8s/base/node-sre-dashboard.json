@@ -1,4 +1,4 @@
-﻿{
+{
   "annotations": {
     "list": []
   },
@@ -258,5 +258,5 @@
   },
   "title": "Node.js SRE Pro (Gold Standard)",
   "uid": "node-sre-gold-standard",
-  "version": 13
+  "version": 14
 }
