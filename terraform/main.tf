@@ -55,14 +55,13 @@ resource "google_project_service" "container" {
   depends_on                 = [google_project_service.resourcemanager]
 }
 
-# Cluster GKE Standard
+# Cluster GKE Autopilot
 resource "google_container_cluster" "primary" {
   name     = "node-k8s-cluster"
   location = var.region
 
-  remove_default_node_pool = true
-  initial_node_count       = 1
-
+  enable_autopilot = true
+  
   network    = "default"
   subnetwork = "default"
 
@@ -74,32 +73,6 @@ resource "google_container_cluster" "primary" {
     google_project_service.container,
     google_project_service.resourcemanager
   ]
-}
-
-# Node Pool Econômico (SPOT)
-resource "google_container_node_pool" "spot_nodes" {
-  name       = "spot-node-pool"
-  location   = var.region
-  cluster    = google_container_cluster.primary.name
-  node_count = 1
-
-  autoscaling {
-    min_node_count = 1
-    max_node_count = 3
-  }
-
-  node_config {
-    spot         = true
-    machine_type = "e2-medium"
-
-    labels = {
-      role = "general"
-    }
-
-    oauth_scopes = [
-      "https://www.googleapis.com/auth/cloud-platform"
-    ]
-  }
 }
 
 # 1. Instalar ArgoCD via Helm
@@ -116,37 +89,10 @@ resource "helm_release" "argocd" {
 
   set {
     name  = "server.service.type"
-    value = "LoadBalancer"
+    value = "NodePort"
   }
 
-  set {
-    name  = "global.tolerations[0].key"
-    value = "instance_type"
-  }
-  set {
-    name  = "global.tolerations[0].operator"
-    value = "Equal"
-  }
-  set {
-    name  = "global.tolerations[0].value"
-    value = "spot"
-  }
-  set {
-    name  = "global.tolerations[0].effect"
-    value = "NoSchedule"
-  }
-
-  values = [
-    yamlencode({
-      server = {
-        service = {
-          type = "LoadBalancer"
-        }
-      }
-    })
-  ]
-  
-  depends_on = [google_container_node_pool.spot_nodes]
+  depends_on = [google_container_cluster.primary]
 }
 
 # 2. Instalar Argo Rollouts via Helm
@@ -162,27 +108,10 @@ resource "helm_release" "argo_rollouts" {
 
   set {
     name  = "dashboard.enabled"
-    value = "true"
+    value = "false"
   }
 
-  set {
-    name  = "controller.tolerations[0].key"
-    value = "instance_type"
-  }
-  set {
-    name  = "controller.tolerations[0].operator"
-    value = "Equal"
-  }
-  set {
-    name  = "controller.tolerations[0].value"
-    value = "spot"
-  }
-  set {
-    name  = "controller.tolerations[0].effect"
-    value = "NoSchedule"
-  }
-
-  depends_on = [google_container_node_pool.spot_nodes]
+  depends_on = [google_container_cluster.primary]
 }
 
 # 4. Instalar Prometheus via Helm (Otimizado)
@@ -208,28 +137,26 @@ resource "helm_release" "prometheus" {
   # Configurar persistência leve (ou desativar para economizar se quiser, mas mantemos 8GB)
   set {
     name  = "server.persistentVolume.size"
-    value = "8Gi"
+    value = "4Gi"
+  }
+
+  set {
+    name  = "server.retention"
+    value = "7d"
+  }
+
+  set {
+    name  = "server.resources.requests.memory"
+    value = "512Mi"
+  }
+
+  set {
+    name  = "server.resources.limits.memory"
+    value = "1Gi"
   }
 
   # Permitir que o Prometheus rode nas instâncias Spot
-  set {
-    name  = "server.tolerations[0].key"
-    value = "instance_type"
-  }
-  set {
-    name  = "server.tolerations[0].operator"
-    value = "Equal"
-  }
-  set {
-    name  = "server.tolerations[0].value"
-    value = "spot"
-  }
-  set {
-    name  = "server.tolerations[0].effect"
-    value = "NoSchedule"
-  }
-
-  depends_on = [google_container_node_pool.spot_nodes]
+  depends_on = [google_container_cluster.primary]
 }
 
 output "kubernetes_cluster_name" {

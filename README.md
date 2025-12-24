@@ -33,10 +33,12 @@ Para verificar o "Self-Healing" da aplicação:
 *   **Observabilidade Avançada**:
     *   **Métricas Prometheus**: Endpoint `/metrics` nativo expondo uso de CPU, memória e contagem de requisições.
     *   **Logging Estruturado**: Utiliza `Winston` com formato JSON em produção (ideal para ELK/Datadog) e formato amigável com cores em desenvolvimento.
-*   **Performance & Escalabilidade**:
-    *   **PDB (Pod Disruption Budget)**: Garante alta disponibilidade (min-available 50%) durante manutenções do cluster GKE (upgrades automáticos/drains), impedindo downtime.
-    *   **HPA (Horizontal Pod Autoscaler)**: Escalabilidade automática baseada no uso de CPU.
-    *   **Builds Multi-estágio**: Dockerfile otimizado para cache e tamanho reduzido da imagem final.
+*   **Performance & Otimização de Custos (FinOps & SRE)**:
+    *   **GKE Autopilot**: Utiliza o modo "Serverless" do GKE para eliminar o "toil" de gerenciamento de nodes e reduzir custos de Control Plane em 100%.
+    *   **Custo-Eficiência Estrita**: Arquitetura desenhada para rodar com o menor custo possível no GCP sem comprometer a confiabilidade, utilizando port-forward para ferramentas administrativas (ArgoCD/Grafana).
+    *   **PDB (Pod Disruption Budget)**: Garante alta disponibilidade (min-available 50%) durante manutenções automatizadas do Google.
+    *   **HPA (Horizontal Pod Autoscaler)**: Escalabilidade dinâmica baseada em métricas reais, permitindo que a infraestrutura encolha em períodos de inatividade.
+    *   **Prometheus Otimizado**: Configuração de retenção e recursos ajustada para o "SRE Hierarchy of Needs", focando em métricas críticas com baixo overhead.
 
 ## 🛠 Stack Tecnológica
 
@@ -141,11 +143,10 @@ kubectl get ingress node-app-ingress
 
 ### 2. Gerenciamento do ArgoCD
 ```bash
-# Obter a senha do usuário 'admin' para o primeiro acesso
-kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
-
-# Obter o IP externo do painel do ArgoCD
-kubectl get svc -n argocd argocd-server
+# Obter o acesso ao ArgoCD (Via Port-Forward - Segurança & Economia)
+# Não expomos ferramentas sensíveis via IP público por boas práticas de segurança e FinOps.
+kubectl port-forward -n argocd svc/argocd-server 8080:443
+# Acesse: https://localhost:8080 (User: admin)
 ```
 
 ### 3. Operação de Rollouts (Canary)
