@@ -69,11 +69,11 @@ data:
         tls:
           insecure: true
       debug:
-        verbosity: basic
+        verbosity: detailed
 
     service:
       pipelines:
         traces:
           receivers: [otlp]
-          processors: [batch]
+          processors: []
           exporters: [otlp, debug]

@@ -20,8 +20,15 @@ const sdk = new NodeSDK({
 });
 
 // Initialize the SDK and register with the OpenTelemetry API
-// this enables the API to record telemetry
-sdk.start();
+console.log('OpenTelemetry: Initializing SDK...');
+try {
+    sdk.start();
+    console.log('OpenTelemetry: SDK started successfully (Service: %s, Endpoint: %s)',
+        process.env.OTEL_SERVICE_NAME || 'node-k8s-app',
+        process.env.OTEL_EXPORTER_OTLP_ENDPOINT || 'http://localhost:4318');
+} catch (error) {
+    console.error('OpenTelemetry: Failed to start SDK', error);
+}
 
 // Gracefully shut down the SDK on process exit
 process.on('SIGTERM', () => {
