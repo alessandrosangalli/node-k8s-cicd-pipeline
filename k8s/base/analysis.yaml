@@ -2,7 +2,6 @@ apiVersion: argoproj.io/v1alpha1
 kind: AnalysisTemplate
 metadata:
   name: success-rate-check
-  namespace: node-k8s-app
 spec:
   metrics:
   - name: error-rate

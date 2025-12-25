@@ -3,8 +3,10 @@ resources:
 
 namespace: node-k8s-app
 
-patches:
+patchesJson6902:
   - target:
+      group: argoproj.io
+      version: v1alpha1
       kind: Rollout
       name: node-k8s-app
     patch: |-

@@ -1,8 +1,7 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: node-k8s-app-pdb
-  namespace: node-k8s-app
+  name: node-k8s-pdb
 spec:
   minAvailable: 50%
   selector:

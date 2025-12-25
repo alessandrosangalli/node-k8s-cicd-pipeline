@@ -2,7 +2,6 @@ apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: node-k8s-hpa
-  namespace: node-k8s-app
 spec:
   scaleTargetRef:
     apiVersion: argoproj.io/v1alpha1

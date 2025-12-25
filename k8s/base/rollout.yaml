@@ -2,7 +2,6 @@ apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
   name: node-k8s-app
-  namespace: node-k8s-app
   labels:
     app: node-k8s-app
 spec:
