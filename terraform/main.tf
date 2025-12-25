@@ -67,6 +67,54 @@ resource "google_container_cluster" "primary" {
 
   deletion_protection = false
 
+  # CKV_GCP_21: Labels
+  resource_labels = {
+    environment = "production"
+    project     = "node-k8s-app"
+  }
+
+  # CKV_GCP_23: Alias IP ranges
+  ip_allocation_policy {
+    cluster_secondary_range_name  = ""
+    services_secondary_range_name = ""
+  }
+
+  # CKV_GCP_20: Master Authorized Networks
+  # master_authorized_networks_config {} # checkov:skip=CKV_GCP_20:Acesso simplificado para portfólio público
+
+  # CKV_GCP_64, CKV_GCP_25: Private Cluster
+  # private_cluster_config {
+  #   enable_private_nodes    = true
+  #   enable_private_endpoint = false
+  #   master_ipv4_cidr_block  = "172.16.0.0/28"
+  # } # checkov:skip=CKV_GCP_64:Acesso simplificado para portfólio público
+  # checkov:skip=CKV_GCP_25:Acesso simplificado para portfólio público
+
+  # CKV_GCP_12: Network Policy
+  network_policy {
+    enabled = true
+  }
+
+  # CKV_GCP_69: Workload Identity / GKE Metadata Server
+  workload_identity_config {
+    workload_pool = "${var.project_id}.svc.id.goog"
+  }
+
+  # CKV_GCP_66: Binary Authorization
+  binary_authorization {
+    evaluation_mode = "PROJECT_SINGLETON_POLICY_ENFORCE"
+  }
+
+  # CKV_GCP_13: Client Certificate Authentication
+  master_auth {
+    client_certificate_config {
+      issue_client_certificate = false
+    }
+  }
+
+  # CKV_GCP_61: Enable VPC Flow Logs (Isso exigiria uma subrede dedicada, pulando para manter simplicidade)
+  # checkov:skip=CKV_GCP_61:Utilizando rede default para redução de custos/complexidade de demo
+
   depends_on = [
     google_project_service.compute,
     google_project_service.container,
