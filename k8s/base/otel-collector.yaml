@@ -65,7 +65,7 @@ data:
 
     exporters:
       otlp:
-        endpoint: tempo:4317
+        endpoint: tempo.node-k8s-app.svc.cluster.local:4317
         tls:
           insecure: true
       debug:

@@ -61,7 +61,9 @@ data:
         otlp:
           protocols:
             http:
+              endpoint: 0.0.0.0:4318
             grpc:
+              endpoint: 0.0.0.0:4317
 
     ingester:
       max_block_duration: 5m               # cut the headblock every 5 minutes
