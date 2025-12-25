@@ -2,6 +2,7 @@ apiVersion: sloth.slok.dev/v1
 kind: PrometheusServiceLevel
 metadata:
   name: node-k8s-app-slo
+  namespace: node-k8s-app
   labels:
     app: node-k8s-app
 spec:

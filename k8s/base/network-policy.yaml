@@ -4,6 +4,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: default-deny-all
+  namespace: node-k8s-app
 spec:
   podSelector: {}
   policyTypes:
@@ -16,6 +17,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: allow-dns-egress
+  namespace: node-k8s-app
 spec:
   podSelector: {}
   policyTypes:
@@ -36,6 +38,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: app-network-policy
+  namespace: node-k8s-app
 spec:
   podSelector:
     matchLabels:
@@ -72,6 +75,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: otel-collector-policy
+  namespace: node-k8s-app
 spec:
   podSelector:
     matchLabels:
@@ -111,6 +115,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: tempo-policy
+  namespace: node-k8s-app
 spec:
   podSelector:
     matchLabels:
@@ -141,6 +146,7 @@ apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
   name: grafana-policy
+  namespace: node-k8s-app
 spec:
   podSelector:
     matchLabels:
