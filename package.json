@@ -1,6 +1,6 @@
 {
   "name": "node-k8s-service",
-  "version": "1.17.0",
+  "version": "1.18.0",
   "description": "Gold Standard Node.js Service for K8s",
   "main": "src/server.js",
   "scripts": {
