@@ -3,6 +3,7 @@ kind: Kustomization
 
 # Sloth CRDs (Prerequisite for SLOs)
 resources:
+- namespace.yaml
 - sloth-crd.yaml
 - rollout.yaml
 - service.yaml
