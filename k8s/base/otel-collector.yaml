@@ -23,7 +23,7 @@ spec:
       automountServiceAccountToken: false
       containers:
       - name: otel-collector
-        image: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.115.0
+        image: otel/opentelemetry-collector-contrib:sha256-f425cd4c252807427f48588e8c0b5b419b3aa14ec9126dcb8d4fa4bd4e7280f2.sig
         imagePullPolicy: Always
         args:
         - "--config=/etc/otel-collector-config.yaml"
@@ -121,4 +121,5 @@ data:
           receivers: [otlp]
           processors: []
           exporters: [otlp, debug]
+
 
