@@ -64,7 +64,9 @@ spec:
             - name: NODE_ENV
               value: "production"
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: "http://otel-collector:4318"
+              value: "http://otel-collector.node-k8s-app.svc.cluster.local:4318"
+            - name: OTEL_EXPORTER_OTLP_PROTOCOL
+              value: "http/json"
             - name: OTEL_SERVICE_NAME
               value: "node-k8s-app"
 
