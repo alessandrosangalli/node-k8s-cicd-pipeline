@@ -23,7 +23,7 @@ spec:
       automountServiceAccountToken: false
       containers:
       - name: tempo
-        image: grafana/tempo:2.6.1
+        image: grafana/tempo@sha256:a6d09da22ebfcc11ba40701433d02738501c3c46271c769a49f4eb9228429e25
         imagePullPolicy: Always
         args:
         - "-config.file=/etc/tempo/tempo.yaml"
