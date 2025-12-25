@@ -5,6 +5,8 @@ namespace: node-k8s-app
 
 resources:
 - namespace.yaml
+# Sloth CRDs (Prerequisite for SLOs)
+- https://raw.githubusercontent.com/slok/sloth/main/pkg/kubernetes/gen/crd/sloth.slok.dev_prometheusservicelevelobjectives.yaml
 - rollout.yaml
 - service.yaml
 - hpa.yaml
