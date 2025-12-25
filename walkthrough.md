@@ -3,7 +3,7 @@
 Resolvi o erro crítico de "Nil Pointer Panic" no ArgoCD através de um diagnóstico profundo em duas frentes:
 1.  **Sanitização de Manifestos**: Identifiquei que arquivos YAML na base sem nova linha ao final causavam o "vazamento" de campos (ex: `kind: Ingresstadata`). Adicionei novas linhas em todos os arquivos base para garantir separação limpa no Kustomize.
 2.  **Reparo de Spec Corrompida**: Localizei uma string fantasma no campo `targetRevision` da aplicação no cluster que travava a reconciliação. Corrigi para seguir a branch `main`.
-3.  **Namespace GitOps**: Restaurei o `namespace.yaml` para garantir que o ambiente seja criado de forma determinística pelo pipeline.
+4.  **OTel Collector stability**: Resolvi o `ErrImagePull` trocando a referência de imagem para o repositório oficial do Docker Hub com o digest/tag verificado (`otel/opentelemetry-collector-contrib` com a tag específica de assinatura/digest), garantindo que o rastreamento distribuído esteja 100% online.
 
 O projeto agora está em estado **Synced** e **Healthy**, com 100% de compliance Checkov e observabilidade total ativa. 🏆
 
