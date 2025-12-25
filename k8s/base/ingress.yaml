@@ -2,6 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: node-k8s-ingress
+  namespace: node-k8s-app
 spec:
   rules:
     - http:

@@ -15,11 +15,32 @@ spec:
       labels:
         app: grafana
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
       containers:
       - name: grafana
-        image: grafana/grafana:11.4.0
+        image: grafana/grafana@sha256:e5f5cd981dc79b137cd6e4c6bc1b9bdfd6bae2923131c77bdd3f4186924e3900
+        imagePullPolicy: Always
         ports:
         - containerPort: 3000
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 60
+          timeoutSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 30
+          timeoutSeconds: 10
         resources:
           requests:
             cpu: "100m"
@@ -29,7 +50,7 @@ spec:
             memory: "512Mi"
         securityContext:
           runAsNonRoot: true
-          runAsUser: 472 # Grafana default user
+          runAsUser: 10001
           readOnlyRootFilesystem: true
           allowPrivilegeEscalation: false
           capabilities:
