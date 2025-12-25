@@ -64,7 +64,6 @@ spec:
       volumes:
       - name: tempo-storage
         emptyDir: {}
-      volumes:
       - name: tempo-config
         configMap:
           name: tempo-config
