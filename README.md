@@ -48,6 +48,10 @@ Dashboards e métricas tratados como código.
 *   Node.js 20+
 *   Docker
 *   Kubernetes (Minikube/Kind/GKE)
+*   **Sloth CRDs**: Necessário para os SLOs as Code.
+    ```bash
+    kubectl apply -f https://raw.githubusercontent.com/slok/sloth/main/pkg/kubernetes/gen/crd/sloth.slok.dev_prometheusservicelevelobjectives.yaml
+    ```
 
 ### Desenvolvimento Local
 ```bash

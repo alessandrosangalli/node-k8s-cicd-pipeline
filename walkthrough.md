@@ -10,6 +10,11 @@ Este projeto atingiu o nível máximo de maturidade para um pipeline Moderno de 
   - **Isolamento de privilégios**: Containers rodando com UIDs altos (>10000) e sistema de arquivos somente leitura.
 - **Zero Trust Network**: Network Policies bloqueando todo o tráfego lateral por padrão.
 
+> [!IMPORTANT]
+> **Dependência de CRD (Sloth)**: Para que os manifestos de SLO (`slo.yaml`) funcionem, o cluster precisa conhecer o recurso `PrometheusServiceLevelObjective`. 
+> Instale os CRDs oficiais com:
+> `kubectl apply -f https://raw.githubusercontent.com/slok/sloth/main/pkg/kubernetes/gen/crd/sloth.slok.dev_prometheusservicelevelobjectives.yaml`
+
 ## 🔭 Observabilidade 2.0 & SRE
 - **Distributed Tracing**: Fluxo completo de traces (App -> Collector -> Tempo).
 - **SLOs as Code**: Definições científicas de confiabilidade com **Error Budgets** visíveis no Grafana.
