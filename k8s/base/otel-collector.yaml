@@ -23,7 +23,7 @@ spec:
       automountServiceAccountToken: false
       containers:
       - name: otel-collector
-        image: otel/opentelemetry-collector-contrib:latest
+        image: otel/opentelemetry-collector-contrib:v0.142.0@sha256:3dcd68bb0726b6711d755ce2577c67f519d0516d9b8c2db741ec83fd73b4d3b2
         imagePullPolicy: Always
         args:
         - "--config=/etc/otel-collector-config.yaml"
