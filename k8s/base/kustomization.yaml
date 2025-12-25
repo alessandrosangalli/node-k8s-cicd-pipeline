@@ -15,6 +15,7 @@ resources:
 - pdb.yaml
 - tempo.yaml
 - otel-collector.yaml
+- slo.yaml
 
 configMapGenerator:
 - files:

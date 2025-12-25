@@ -1,0 +1,43 @@
+apiVersion: sloth.slok.dev/v1
+kind: PrometheusServiceLevelObjective
+metadata:
+  name: node-k8s-app-slo
+  namespace: node-k8s-app
+  labels:
+    app: node-k8s-app
+spec:
+  service: node-k8s-app
+  labels:
+    owner: platform-team
+    tier: "1"
+  slos:
+    - name: availability
+      objective: 99.9
+      description: "99.9% das requisições devem retornar sucesso (não 5xx) nos últimos 30 dias."
+      sli:
+        events:
+          error_query: sum(rate(http_requests_total{app="node-k8s-app", status=~"5.."}[{{.window}}]))
+          total_query: sum(rate(http_requests_total{app="node-k8s-app"}[{{.window}}]))
+      alerting:
+        name: NodeAppHighErrorRate
+        labels:
+          category: availability
+          severity: critical
+        annotations:
+          summary: "Orçamento de erro de disponibilidade está se esgotando rapidamente"
+          description: "O SLO de disponibilidade de 99.9% está sendo violado devido a erros 5xx."
+
+    - name: latency
+      objective: 95
+      description: "95% das requisições devem ser concluídas em menos de 500ms."
+      sli:
+        events:
+          error_query: sum(rate(http_request_duration_seconds_count{app="node-k8s-app"}[{{.window}}])) - sum(rate(http_request_duration_seconds_bucket{app="node-k8s-app", le="0.5"}[{{.window}}]))
+          total_query: sum(rate(http_request_duration_seconds_count{app="node-k8s-app"}[{{.window}}]))
+      alerting:
+        name: NodeAppHighLatency
+        labels:
+          category: latency
+          severity: warning
+        annotations:
+          summary: "Latência está acima do esperado (SLO 95% < 500ms)"

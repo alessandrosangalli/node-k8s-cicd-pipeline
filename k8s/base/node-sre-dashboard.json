@@ -18,6 +18,105 @@
       "type": "row"
     },
     {
+      "id": 200,
+      "type": "row",
+      "title": "💰 Reliability & SLOs (Sloth-based)",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 1
+      }
+    },
+    {
+      "id": 201,
+      "type": "gauge",
+      "title": "✅ Availability SLO (Target 99.9%)",
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 0,
+        "y": 2
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "100 * (sum(rate(http_requests_total{namespace=~\"$namespace\", app=~\"$app\", status!~\"5..\"}[24h])) or vector(1)) / (sum(rate(http_requests_total{namespace=~\"$namespace\", app=~\"$app\"}[24h])) or vector(1))",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "min": 99,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 99.5
+              },
+              {
+                "color": "green",
+                "value": 99.9
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 202,
+      "type": "gauge",
+      "title": "📉 Error Budget Remaining (%)",
+      "gridPos": {
+        "h": 7,
+        "w": 12,
+        "x": 12,
+        "y": 2
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "targets": [
+        {
+          "expr": "100 - ((100 - (100 * (sum(rate(http_requests_total{namespace=~\"$namespace\", app=~\"$app\", status!~\"5..\"}[24h])) or vector(1)) / (sum(rate(http_requests_total{namespace=~\"$namespace\", app=~\"$app\"}[24h])) or vector(1)))) / 0.1 * 100)",
+          "refId": "A"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 100,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 20
+              },
+              {
+                "color": "green",
+                "value": 50
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
       "id": 1,
       "type": "timeseries",
       "title": "📊 Throughput (RPS)",
@@ -25,7 +124,7 @@
         "h": 7,
         "w": 8,
         "x": 0,
-        "y": 1
+        "y": 9
       },
       "datasource": {
         "type": "prometheus",
@@ -47,7 +146,7 @@
         "h": 7,
         "w": 8,
         "x": 8,
-        "y": 1
+        "y": 9
       },
       "datasource": {
         "type": "prometheus",
@@ -69,7 +168,7 @@
         "h": 7,
         "w": 8,
         "x": 16,
-        "y": 1
+        "y": 9
       },
       "datasource": {
         "type": "prometheus",
@@ -88,7 +187,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 8
+        "y": 16
       },
       "id": 100,
       "title": "🧪 Infrastructure (Process-level)",
@@ -102,7 +201,7 @@
         "h": 7,
         "w": 8,
         "x": 0,
-        "y": 9
+        "y": 17
       },
       "datasource": {
         "type": "prometheus",
@@ -123,7 +222,7 @@
         "h": 7,
         "w": 8,
         "x": 8,
-        "y": 9
+        "y": 17
       },
       "datasource": {
         "type": "prometheus",
@@ -145,7 +244,7 @@
         "h": 7,
         "w": 8,
         "x": 16,
-        "y": 9
+        "y": 17
       },
       "datasource": {
         "type": "prometheus",
