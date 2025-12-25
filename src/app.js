@@ -71,6 +71,7 @@ app.get('/version', (req, res) => {
 
 
 // Global Error Handler
+// eslint-disable-next-line no-unused-vars
 app.use((err, req, res, _next) => {
     logger.error(`${err.status || 500} - ${err.message} - ${req.originalUrl} - ${req.method} - ${req.ip}`);
     res.status(err.status || 500).json({

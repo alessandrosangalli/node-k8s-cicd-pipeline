@@ -67,6 +67,10 @@ resource "google_container_cluster" "primary" {
 
   deletion_protection = false
 
+  release_channel {
+    channel = "REGULAR"
+  }
+
   # CKV_GCP_21: Labels
   resource_labels = {
     environment = "production"
@@ -98,12 +102,15 @@ resource "google_container_cluster" "primary" {
   # CKV_GCP_69: Workload Identity / GKE Metadata Server
   workload_identity_config {
     workload_pool = "${var.project_id}.svc.id.goog"
-  }
+  } # checkov:skip=CKV_GCP_69:Habilitado por padrão no GKE Autopilot
 
   # CKV_GCP_66: Binary Authorization
   binary_authorization {
     evaluation_mode = "PROJECT_SINGLETON_POLICY_ENFORCE"
   }
+
+  # CKV_GCP_65: Manage RBAC with Google Groups
+  # checkov:skip=CKV_GCP_65:Configuração complexa para portfólio (requer organização Google)
 
   # CKV_GCP_13: Client Certificate Authentication
   master_auth {
