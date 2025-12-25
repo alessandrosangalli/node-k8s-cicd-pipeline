@@ -16,30 +16,31 @@ A pipeline implementa **Semantic Versioning** totalmente automatizado:
 *   **Changelog Automático**: Gera notas de release detalhadas a cada versão.
 *   **Release-First Workflow**: O build e deploy Docker só ocorrem após uma versão ser oficialmente "tageada", garantindo rastreabilidade total do que está rodando em produção.
 
-### 3. Observabilidade e SRE
-Dashboards e métricas tratados como código.
-*   **Grafana as Code**: Dashboards provisionados automaticamente via ConfigMaps.
-*   **Golden Signals**: Monitoramento nativo de Latência, Tráfego, Erros e Saturação.
-*   **Prometheus**: Exposição de métricas de negócio e runtime via endpoint `/metrics`.
+### 3. Observabilidade SRE 2.0
+Dashboards, métricas e alertas tratados como código (Observability as Code).
+*   **SLOs as Code (Sloth)**: Definição científica de confiabilidade com **Service Level Objectives** de Disponibilidade (99.9%) e Latência (95% < 500ms).
+*   **Distributed Tracing (Tempo)**: Rastreamento completo de requisições ponta-a-ponta integrado ao Grafana.
+*   **Grafana as Code**: Dashboards e Data Sources provisionados automaticamente via ConfigMaps.
+*   **Golden Signals**: Monitoramento nativo de Latência, Tráfego, Erros e Saturação via OpenTelemetry.
 
-### 4. Segurança em Profundidade
-*   **IaC Security Scanner (Novo!)**: Uso de **Checkov** para análise estática de segurança em manifestos Kubernetes e arquivos Terraform.
-*   **Supply Chain Security**: Escaneamento de vulnerabilidades com **Trivy** no código fonte e na imagem final do container.
-*   **Least Privilege**: Containers rodam como usuário não-root (UID 1000).
-*   **Hardening**: Uso de `helmet` para headers HTTP seguros e imagem base Alpine para menor superfície de ataque.
+### 4. Segurança em Profundidade (DevSecOps)
+*   **Zero Trust Networking**: Network Policies estritas que bloqueiam por padrão todo o tráfego lateral no cluster.
+*   **Imutabilidade & Integridade**: Imagens fixadas via **SHA256 Digest** e sistema de arquivos do container em modo **Read-Only**.
+*   **IaC Security Scanner**: Uso de **Checkov** para análise estática em manifestos Kubernetes e Terraform (0 falhas críticas).
+*   **Supply Chain Security**: Escaneamento de vulnerabilidades com **Trivy** (CVE scan) automatizado na pipeline.
+*   **Rootless Execution**: Containers rodam com usuário não-root (UID 10001) e capabilities de kernel removidas.
 
 ## 🛠 Stack Tecnológica
 
 | Componente | Tecnologia | Função |
 | :--- | :--- | :--- |
 | **Runtime** | Node.js 22 (LTS) | Execução do serviço de alta performance |
-| **Observabilidade 2.0** | OpenTelemetry (OTel) | Tracing distribuído e métricas unificadas |
+| **Observabilidade 2.0** | OpenTelemetry, Tempo & Sloth | Tracing distribuído e SLOs as Code |
 | **Orquestração** | Kubernetes & GKE | Gerenciamento de containers |
-| **GitOps** | ArgoCD | Continuous Delivery |
+| **GitOps** | ArgoCD & Kustomize | Continuous Delivery & Configuration |
 | **Progressive Delivery** | Argo Rollouts | Canary Deployments |
-| **Observabilidade** | Prometheus & Grafana | Monitoramento e Alertas |
-| **Segurança (IaC)** | Checkov | Static Analysis (Scan Terraform/K8s) |
-| **Segurança (App/Image)** | AquaSecurity Trivy | Vulnerability Scanning |
+| **Observabilidade** | Prometheus & Grafana | Monitoramento e Dashboards |
+| **Segurança** | Checkov, Trivy & NetPol | DevSecOps & Zero Trust |
 | **Release** | Semantic Release | Versionamento Automático |
 
 ## 🚀 Como Executar
@@ -85,8 +86,8 @@ Em ambientes GitOps, o botão de Rollback da UI pode ser bloqueado pelo Auto-Syn
 # ArgoCD
 kubectl port-forward -n argocd svc/argocd-server 8080:443
 
-# Grafana
-kubectl port-forward -n monitoring svc/grafana 3000:80
+# Grafana (Dashboards SRE)
+kubectl port-forward -n node-k8s-app svc/grafana 3004:80
 ```
 
 ---

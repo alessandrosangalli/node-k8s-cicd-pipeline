@@ -25,7 +25,7 @@ spec:
       automountServiceAccountToken: false
       containers:
       - name: grafana
-        image: grafana/grafana@sha256:e5f5cd981dc79b137cd6e4c6bc1b9bdfd6bae2923131c77bdd3f4186924e3900
+        image: grafana/grafana@sha256:d8ea37798ccc41061a62ab080f2676dda6bf7815558499f901bdb0f533a456fb
         imagePullPolicy: Always
         ports:
         - containerPort: 3000
