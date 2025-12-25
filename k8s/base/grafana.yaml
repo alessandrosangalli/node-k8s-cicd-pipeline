@@ -70,6 +70,19 @@ data:
       jsonData:
         httpMethod: POST
         scrapeInterval: 1m
+    - name: Tempo
+      type: tempo
+      uid: tempo
+      url: http://tempo:3200
+      access: proxy
+      jsonData:
+        httpMethod: GET
+        tracesToLogs:
+          datasourceUid: 'prometheus'
+          tags: ['job', 'instance', 'pod']
+          mappedTags: [{key: 'service.name', value: 'service'}]
+          mapTagNamesEnabled: true
+
 ---
 apiVersion: v1
 kind: ConfigMap

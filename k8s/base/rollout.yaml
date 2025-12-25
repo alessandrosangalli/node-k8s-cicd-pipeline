@@ -63,6 +63,11 @@ spec:
           env:
             - name: NODE_ENV
               value: "production"
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otel-collector:4318"
+            - name: OTEL_SERVICE_NAME
+              value: "node-k8s-app"
+
   strategy:
     canary:
       canaryMetadata:

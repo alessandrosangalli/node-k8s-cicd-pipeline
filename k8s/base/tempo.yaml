@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tempo
+  namespace: node-k8s-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tempo
+  template:
+    metadata:
+      labels:
+        app: tempo
+    spec:
+      containers:
+      - name: tempo
+        image: grafana/tempo:latest
+        args:
+        - "-config.file=/etc/tempo/tempo.yaml"
+        ports:
+        - containerPort: 3200 # HTTP
+        - containerPort: 4317 # OTLP gRPC
+        - containerPort: 4318 # OTLP HTTP
+        volumeMounts:
+        - name: tempo-config
+          mountPath: /etc/tempo
+      volumes:
+      - name: tempo-config
+        configMap:
+          name: tempo-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tempo
+  namespace: node-k8s-app
+spec:
+  selector:
+    app: tempo
+  ports:
+  - name: http
+    port: 3200
+    targetPort: 3200
+  - name: otlp-grpc
+    port: 4317
+    targetPort: 4317
+  - name: otlp-http
+    port: 4318
+    targetPort: 4318
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tempo-config
+  namespace: node-k8s-app
+data:
+  tempo.yaml: |
+    server:
+      http_listen_port: 3200
+
+    distributor:
+      receivers:
+        otlp:
+          protocols:
+            http:
+            grpc:
+
+    ingester:
+      max_block_duration: 5m               # cut the headblock every 5 minutes
+
+    compactor:
+      compaction:
+        compaction_interval: 30s
+        max_block_bytes: 1073741824
+        block_retention: 1h
+        compacted_block_retention: 1h
+
+    storage:
+      trace:
+        backend: local                     # local backend persists traces to disk
+        local:
+          path: /var/tempo/traces
+        wal:
+          path: /var/tempo/wal             # where to store the wal locally

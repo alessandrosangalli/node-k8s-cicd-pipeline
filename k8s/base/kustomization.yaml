@@ -11,6 +11,8 @@ resources:
 - backend-config.yaml
 - grafana.yaml
 - pdb.yaml
+- tempo.yaml
+- otel-collector.yaml
 
 configMapGenerator:
 - files:
