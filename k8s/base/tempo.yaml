@@ -68,15 +68,13 @@ data:
 
     compactor:
       compaction:
-        compaction_interval: 30s
-        max_block_bytes: 1073741824
         block_retention: 1h
-        compacted_block_retention: 1h
 
     storage:
       trace:
-        backend: local                     # local backend persists traces to disk
+        backend: local
+        wal:
+          path: /var/tempo/wal
         local:
           path: /var/tempo/traces
-        wal:
-          path: /var/tempo/wal             # where to store the wal locally
+
