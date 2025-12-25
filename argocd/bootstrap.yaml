@@ -7,7 +7,7 @@ spec:
   project: default
   source:
     repoURL: https://github.com/alessandrosangalli/node-k8s-cicd-pipeline.git
-    targetRevision: HEAD
+    targetRevision: main
     path: k8s/overlays/production
   destination:
     server: https://kubernetes.default.svc
@@ -17,7 +17,5 @@ spec:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
-      - ServerSideApply=true
       - FailOnSharedResource=true
       - ApplyOutOfSyncOnly=true

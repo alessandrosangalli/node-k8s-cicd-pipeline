@@ -48,8 +48,7 @@ spec:
   - Egress
   ingress:
   # Permite tráfego de Ingress (Load Balancer)
-  - from: [] 
-    ports:
+  - ports:
     - protocol: TCP
       port: 3000
   # Permite que o Prometheus faça o scrape de métricas
@@ -156,8 +155,7 @@ spec:
   - Egress
   ingress:
   # Permite acesso ao dashboard (via port-forward ou ingress)
-  - from: []
-    ports:
+  - ports:
     - protocol: TCP
       port: 3000
   egress:
