@@ -21,4 +21,4 @@ configMapGenerator:
 images:
 - name: ghcr.io/alessandrosangalli/node-k8s-cicd-pipeline
   newName: ghcr.io/alessandrosangalli/node-k8s-cicd-pipeline
-  newTag: 89a00b92a5ca86992220bfc5d7c5c8e9ebc2e942
+  newTag: 1.0.0
