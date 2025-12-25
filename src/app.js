@@ -3,6 +3,7 @@ const promClient = require('prom-client');
 const logger = require('./utils/logger');
 const helmet = require('helmet');
 const cors = require('cors');
+const packageJson = require('../package.json');
 
 const app = express();
 
@@ -59,6 +60,15 @@ app.get('/metrics', async (req, res) => {
     res.set('Content-Type', promClient.register.contentType);
     res.end(await promClient.register.metrics());
 });
+
+app.get('/version', (req, res) => {
+    res.json({
+        version: packageJson.version,
+        name: packageJson.name,
+        description: packageJson.description
+    });
+});
+
 
 // Global Error Handler
 app.use((err, req, res, next) => {

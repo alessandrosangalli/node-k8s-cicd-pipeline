@@ -31,7 +31,7 @@ Dashboards e métricas tratados como código.
 
 | Componente | Tecnologia | Função |
 | :--- | :--- | :--- |
-| **Runtime** | Node.js 20 (LTS) | Execução do serviço de alta performance |
+| **Runtime** | Node.js 22 (LTS) | Execução do serviço de alta performance |
 | **Orquestração** | Kubernetes & GKE | Gerenciamento de containers |
 | **GitOps** | ArgoCD | Continuous Delivery |
 | **Progressive Delivery** | Argo Rollouts | Canary Deployments |
