@@ -23,6 +23,7 @@ Dashboards e métricas tratados como código.
 *   **Prometheus**: Exposição de métricas de negócio e runtime via endpoint `/metrics`.
 
 ### 4. Segurança em Profundidade
+*   **IaC Security Scanner (Novo!)**: Uso de **Checkov** para análise estática de segurança em manifestos Kubernetes e arquivos Terraform.
 *   **Supply Chain Security**: Escaneamento de vulnerabilidades com **Trivy** no código fonte e na imagem final do container.
 *   **Least Privilege**: Containers rodam como usuário não-root (UID 1000).
 *   **Hardening**: Uso de `helmet` para headers HTTP seguros e imagem base Alpine para menor superfície de ataque.
@@ -37,7 +38,8 @@ Dashboards e métricas tratados como código.
 | **GitOps** | ArgoCD | Continuous Delivery |
 | **Progressive Delivery** | Argo Rollouts | Canary Deployments |
 | **Observabilidade** | Prometheus & Grafana | Monitoramento e Alertas |
-| **Segurança** | AquaSecurity Trivy | Vulnerability Scanning |
+| **Segurança (IaC)** | Checkov | Static Analysis (Scan Terraform/K8s) |
+| **Segurança (App/Image)** | AquaSecurity Trivy | Vulnerability Scanning |
 | **Release** | Semantic Release | Versionamento Automático |
 
 ## 🚀 Como Executar

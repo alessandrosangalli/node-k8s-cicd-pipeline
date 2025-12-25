@@ -54,6 +54,16 @@ jobs:
           scan-ref: '.'
           trivy-config: trivy.yaml
 
+      - name: Run Checkov IaC scanner
+        uses: bridgecrewio/checkov-action@master
+        with:
+          directory: .
+          framework: terraform,kubernetes
+          quiet: true
+          soft_fail: true # Permitir que passe mas registre logs no início, para não quebrar tudo de vez
+          output_format: cli,sarif
+          output_file_path: results.sarif
+
   release:
     runs-on: ubuntu-latest
     needs: security-scan-code
