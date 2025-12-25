@@ -2,6 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Rollout
 metadata:
   name: node-k8s-app
+  namespace: node-k8s-app
   labels:
     app: node-k8s-app
 spec:
@@ -31,9 +32,13 @@ spec:
                         - node-k8s-app
                 topologyKey: "kubernetes.io/hostname"
       securityContext:
+        runAsNonRoot: true
         runAsUser: 1000
         runAsGroup: 1000
-        fsGroup: 2000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      automountServiceAccountToken: false
       containers:
         - name: node-app
           image: ghcr.io/alessandrosangalli/node-k8s-cicd-pipeline:latest
@@ -48,6 +53,14 @@ spec:
             limits:
               memory: "256Mi"
               cpu: "250m"
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
           livenessProbe:
             httpGet:
               path: /health

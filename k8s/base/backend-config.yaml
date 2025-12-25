@@ -2,6 +2,7 @@ apiVersion: cloud.google.com/v1
 kind: BackendConfig
 metadata:
   name: node-app-be-config
+  namespace: node-k8s-app
 spec:
   healthCheck:
     checkIntervalSec: 10
