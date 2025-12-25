@@ -41,3 +41,4 @@ spec:
           severity: warning
         annotations:
           summary: "Latência está acima do esperado (SLO 95% < 500ms)"
+

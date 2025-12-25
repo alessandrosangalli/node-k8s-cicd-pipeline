@@ -121,3 +121,4 @@ data:
           receivers: [otlp]
           processors: []
           exporters: [otlp, debug]
+

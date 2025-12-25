@@ -22,3 +22,4 @@ spec:
           (
             sum(rate(http_requests_total{role="canary", route!="/health"}[2m])) or vector(1)
           )
+

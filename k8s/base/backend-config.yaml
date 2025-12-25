@@ -12,3 +12,4 @@ spec:
     type: HTTP
     requestPath: /health
     port: 3000
+
