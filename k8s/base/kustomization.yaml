@@ -3,9 +3,9 @@ kind: Kustomization
 namespace: node-k8s-app
 
 
+# Sloth CRDs (Prerequisite for SLOs)
 resources:
 - namespace.yaml
-# Sloth CRDs (Prerequisite for SLOs)
 - https://raw.githubusercontent.com/slok/sloth/main/pkg/kubernetes/gen/crd/sloth.slok.dev_prometheusservicelevelobjectives.yaml
 - rollout.yaml
 - service.yaml
@@ -29,4 +29,4 @@ configMapGenerator:
 images:
 - name: ghcr.io/alessandrosangalli/node-k8s-cicd-pipeline
   newName: ghcr.io/alessandrosangalli/node-k8s-cicd-pipeline
-  newTag: 1.19.2
+  newTag: 1.20.0
