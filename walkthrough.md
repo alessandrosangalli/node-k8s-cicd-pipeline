@@ -33,5 +33,8 @@ Este projeto atingiu o nível máximo de maturidade para um pipeline Moderno de 
 2. **Acompanhe os SLOs**:
    No Grafana, o painel de **Reliability** agora é alimentado por métricas precisas que definem se o serviço está saudável perante o usuário final.
 
+3. **Acesso ao ArgoCD**:
+   Recupere a senha inicial com o comando listado no README e acesse o dashboard para ver a sincronização em tempo real das **Network Policies** e **SLOs**.
+
 ---
 **Conclusão**: O repositório agora serve como um modelo vivo de Engenharia de Plataforma Próxima Geração.

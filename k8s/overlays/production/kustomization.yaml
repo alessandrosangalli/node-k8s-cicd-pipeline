@@ -1,6 +1,8 @@
 resources:
   - ../../base
 
+namespace: node-k8s-app
+
 patches:
   - target:
       kind: Rollout

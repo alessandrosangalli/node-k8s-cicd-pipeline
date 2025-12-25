@@ -82,9 +82,18 @@ Em ambientes GitOps, o botão de Rollback da UI pode ser bloqueado pelo Auto-Syn
 > 📖 [Leia o Guia de Rollback GitOps](./GITOPS_ROLLBACK_GUIDE.md) para saber como proceder.
 
 ### Acessando Dashboards (Comandos de Port-Forward)
+
+**ArgoCD (Credenciais: admin / inicial)**
 ```bash
-# ArgoCD
+# Obter senha inicial do admin (Linux/MacOS/Bash)
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+
+# Obter senha inicial do admin (Windows PowerShell)
+[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String((kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}")))
+
+# Port-forward
 kubectl port-forward -n argocd svc/argocd-server 8080:443
+```
 
 # Grafana (Dashboards SRE)
 kubectl port-forward -n node-k8s-app svc/grafana 3004:80
