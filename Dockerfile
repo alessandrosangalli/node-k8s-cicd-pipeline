@@ -23,6 +23,7 @@ USER node
 
 # Copy only necessary files
 COPY --chown=node:node --from=builder /usr/src/app/node_modules ./node_modules
+COPY --chown=node:node package.json ./
 COPY --chown=node:node src ./src
 
 ENV NODE_ENV=production
