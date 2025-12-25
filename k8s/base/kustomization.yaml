@@ -4,6 +4,7 @@ namespace: node-k8s-app
 
 
 resources:
+- namespace.yaml
 - rollout.yaml
 - service.yaml
 - hpa.yaml
