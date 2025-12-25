@@ -1,0 +1,179 @@
+# 1. Bloqueio Total (Default Deny)
+# Isola o namespace completamente por padrão
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: default-deny-all
+  namespace: node-k8s-app
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+---
+# 2. Permitir DNS (Essencial)
+# Permite que todos os pods consultem o CoreDNS no kube-system
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-dns-egress
+  namespace: node-k8s-app
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+---
+# 3. Políticas para o App (node-k8s-app)
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: app-network-policy
+  namespace: node-k8s-app
+spec:
+  podSelector:
+    matchLabels:
+      app: node-k8s-app
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Permite tráfego de Ingress (Load Balancer)
+  - from: [] 
+    ports:
+    - protocol: TCP
+      port: 3000
+  # Permite que o Prometheus faça o scrape de métricas
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: monitoring
+    ports:
+    - protocol: TCP
+      port: 3000
+  egress:
+  # Permite enviar traces para o OTel Collector
+  - to:
+    - podSelector:
+        matchLabels:
+          app: otel-collector
+    ports:
+    - protocol: TCP
+      port: 4318
+---
+# 4. Políticas para o OTel Collector
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: otel-collector-policy
+  namespace: node-k8s-app
+spec:
+  podSelector:
+    matchLabels:
+      app: otel-collector
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Permite receber do App
+  - from:
+    - podSelector:
+        matchLabels:
+          app: node-k8s-app
+    ports:
+    - protocol: TCP
+      port: 4318
+  # Permite scrape de métricas pelo Prometheus
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: monitoring
+    ports:
+    - protocol: TCP
+      port: 8888
+  egress:
+  # Permite enviar traces para o Tempo
+  - to:
+    - podSelector:
+        matchLabels:
+          app: tempo
+    ports:
+    - protocol: TCP
+      port: 4317
+---
+# 5. Políticas para o Tempo
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: tempo-policy
+  namespace: node-k8s-app
+spec:
+  podSelector:
+    matchLabels:
+      app: tempo
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Permite receber do Coletor
+  - from:
+    - podSelector:
+        matchLabels:
+          app: otel-collector
+    ports:
+    - protocol: TCP
+      port: 4317
+  # Permite que o Grafana consulte o Tempo
+  - from:
+    - podSelector:
+        matchLabels:
+          app: grafana
+    ports:
+    - protocol: TCP
+      port: 3200
+---
+# 6. Políticas para o Grafana
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: grafana-policy
+  namespace: node-k8s-app
+spec:
+  podSelector:
+    matchLabels:
+      app: grafana
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  # Permite acesso ao dashboard (via port-forward ou ingress)
+  - from: []
+    ports:
+    - protocol: TCP
+      port: 3000
+  egress:
+  # Permite consultar o Prometheus no namespace monitoring
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: monitoring
+    ports:
+    - protocol: TCP
+      port: 80
+  # Permite consultar o Tempo
+  - to:
+    - podSelector:
+        matchLabels:
+          app: tempo
+    ports:
+    - protocol: TCP
+      port: 3200

@@ -16,6 +16,7 @@ resources:
 - tempo.yaml
 - otel-collector.yaml
 - slo.yaml
+- network-policy.yaml
 
 configMapGenerator:
 - files:
