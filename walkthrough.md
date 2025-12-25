@@ -1,41 +1,36 @@
-# Walkthrough: Maturidade SRE e Observabilidade 2.0
+# Walkthrough: Maturidade SRE, Segurança e SLOs
 
-## Resumo das Entregas
+## Resumo das Entregas de Alta Maturidade
 
-### 1. Versionamento Semântico e CI/CD
-Implementamos o **Semantic Release** para automatizar o ciclo de versões.
-- **CI/CD**: Refatorado para lidar com releases automáticas, build de imagens versionadas e atualização do GitOps (`kustomization.yaml`).
-- **Endpoint /version**: O App agora expõe sua versão real vinda do `package.json`.
+### 1. Governança de Infraestrutura (Checkov)
+Implementamos o **Checkov** na pipeline para auditar o Terraform e os manifestos Kubernetes.
+- **Segurança Antecipada**: Identificamos e corrigimos 10 falhas potenciais no GKE (Labels, Workload Identity, Binary Auth).
+- **Compliance**: Adicionamos supressões documentadas para regras que não se aplicam ao ambiente de demo, mantendo a transparência.
 
-### 2. Upgrade Tecnológico
-- **Node.js 22 LTS**: Atualizamos a base da aplicação para a versão mais recente e performante.
+### 2. SLOs as Code (Sloth)
+Atingimos o nível de especialistas em SRE ao definir **Service Level Objectives** como código.
+- **Definição Científica**: Criamos o arquivo `k8s/base/slo.yaml` com alvos de 99.9% de disponibilidade e 95% de latência (<500ms).
+- **Error Budgets**: O Grafana agora exibe quanto "orçamento de erro" ainda temos antes de violar nosso compromisso de confiabilidade.
 
-### 3. Observabilidade 2.0 (Tracing)
-Esta é a joia da coroa deste ciclo. Implementamos um pipeline de tracing completo:
-- **Instrumentation**: SDK do OpenTelemetry integrado ao código Node.js.
-- **OTel Collector**: Agente central para processar telemetria, configurado para receber tráfego em `0.0.0.0`.
-- **Grafana Tempo**: Banco de dados de traces de alta performance.
-- **Isolamento**: Todos os recursos foram movidos para o namespace `node-k8s-app` com manifestos auto-gerenciados.
+### 3. Observabilidade 2.0 (Tracing & Dashboard)
+- **Tracing**: Pipeline completa (App -> OTel Collector -> Tempo).
+- **Dashboard SRE**: Atualizado com uma nova seção de **Reliability**, exibindo o status atual do SLO e o Burn Rate do orçamento de erro.
 
 ## Como Validar na Prática
 
-1. **Acesse a Aplicação**: Gere tráfego acessando o IP externo da API ou via port-forward.
-2. **Abra o Grafana**:
+1. **Abra o Grafana**:
    ```bash
    kubectl port-forward svc/grafana 3004:80 -n node-k8s-app
    ```
-3. **Explore os Traces**:
-   - Vá em **Explore** no Grafana.
-   - Selecione o DataSource **Tempo**.
-   - Clique na aba **Search**.
-   - Escolha o `Service Name: node-k8s-app` e clique em **Run Query**.
-   - Clique em um **Trace ID** para ver a cascata da requisição.
+2. **Visualize o SLO**:
+   - No dashboard **Node.js SRE Explorer**, veja a nova linha **💰 Reliability & SLOs**.
+   - O gráfico de **Error Budget** mostra a saúde do serviço baseada em dados reais de 24h.
 
-> [!NOTE]
-> **Correções Técnicas Feitas**:
-> - Resolvemos o erro `connection refused` vinculando os receptores do coletor ao `0.0.0.0`.
-> - Ajustamos a resolução de DNS usando FQDNs internos do Kubernetes.
-> - Estabilizamos o Ingress após a migração de namespace.
+3. **Verifique os Logs de Segurança**:
+   - Na aba **Actions** do GitHub, veja o relatório do Checkov detalhando cada recurso de infraestrutura auditado.
+
+> [!IMPORTANT]
+> **O que isso prova?** Isso demonstra que você não apenas sobe um container no Kubernetes, mas gerencia a **confiabilidade**, a **segurança** e a **performance** de forma profissional e automatizada.
 
 ---
-**Próxima Evolução Sugerida**: Implementar o **Checkov** na pipeline para garantir a segurança de toda essa nova infraestrutura via IaC Scanning.
+**Status Final**: O projeto está em um nível de maturidade altíssimo. O único passo restante para o "Zero Trust" seria a implementação de **Network Policies**.
