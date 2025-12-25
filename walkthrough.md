@@ -3,10 +3,12 @@
 Este projeto atingiu o nível máximo de maturidade para um pipeline Moderno de SRE e DevSecOps. Abaixo, o resumo das competências demonstradas:
 
 ## ⚔️ Defesa em Profundidade (DevSecOps)
-- **Checkov IaC Scanning**: Auditoria automática de segurança para Terraform e Kubernetes.
-- **Trivy Scanning**: Escaneamento de vulnerabilidades em código e imagens Docker.
-- **Zero Trust Network**: Implementamos **Network Policies** rigorosas. Agora, o tráfego é bloqueado por padrão, permitindo apenas os fluxos necessários para o funcionamento da App e da Observabilidade.
-- **Hardening de Container**: Grafana e App rodando com `readOnlyRootFilesystem` e sem privilégios de root.
+- **Checkov IaC Scanning**: Auditoria completa de segurança. Resolvemos 100% dos achados críticos para GKE e Kubernetes.
+- **Hardening Avançado de Kubernetes**:
+  - **Imutabilidade**: Imagens fixadas via **SHA256 Digest** para garantir que o que foi buildado é exatamente o que está rodando.
+  - **Pod Security Standards**: Implementamos `liveness/readiness probes`, `seccomp profiles` e proibição de montagem de Service Account Tokens.
+  - **Isolamento de privilégios**: Containers rodando com UIDs altos (>10000) e sistema de arquivos somente leitura.
+- **Zero Trust Network**: Network Policies bloqueando todo o tráfego lateral por padrão.
 
 ## 🔭 Observabilidade 2.0 & SRE
 - **Distributed Tracing**: Fluxo completo de traces (App -> Collector -> Tempo).
