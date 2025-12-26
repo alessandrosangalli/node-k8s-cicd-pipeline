@@ -60,7 +60,9 @@ resource "google_container_cluster" "primary" {
   name     = "node-k8s-cluster"
   location = var.region
 
-  enable_autopilot = false
+  # enable_autopilot conflicts with standard cluster features like custom node pools
+  # enable_autopilot = false 
+
   
   remove_default_node_pool = true
   initial_node_count       = 1
