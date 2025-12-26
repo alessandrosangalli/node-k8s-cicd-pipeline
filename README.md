@@ -24,11 +24,19 @@ Dashboards, métricas e alertas tratados como código (Observability as Code).
 *   **Golden Signals**: Monitoramento nativo de Latência, Tráfego, Erros e Saturação via OpenTelemetry.
 
 ### 4. Segurança em Profundidade (DevSecOps)
-*   **Zero Trust Networking**: Network Policies estritas que bloqueiam por padrão todo o tráfego lateral no cluster.
+*   **Zero Trust Networking**: Network Policies estritas (Calico) que bloqueiam por padrão todo o tráfego lateral no cluster.
+*   **Node Hardening**: Nodes utilizam **Secure Boot** (Shielded GKE Nodes) e integridade verificada de bootloader. A gestão é automatizada com Auto-Repair e Auto-Upgrade.
 *   **Imutabilidade & Integridade**: Imagens fixadas via **SHA256 Digest** e sistema de arquivos do container em modo **Read-Only**.
 *   **IaC Security Scanner**: Uso de **Checkov** para análise estática em manifestos Kubernetes e Terraform (0 falhas críticas).
 *   **Supply Chain Security**: Escaneamento de vulnerabilidades com **Trivy** (CVE scan) automatizado na pipeline.
 *   **Rootless Execution**: Containers rodam com usuário não-root (UID 10001) e capabilities de kernel removidas.
+
+### 5. FinOps & Otimização de Custos (Novo!)
+Arquitetura desenhada para eficiência econômica máxima sem sacrificar a robustez:
+*   **Spot Fleet Strategy**: O ambiente de produção roda, em **Spot Instances (Preemptible)**, reduzindo os custos de computação em até **90%** em comparação com instâncias sob demanda.
+*   **Resiliência a Falhas**: A aplicação foi projetada para sobreviver à natureza volátil das instâncias Spot (Chaos Engineering nativo).
+*   **Autoscaling Inteligente**: O cluster escala seus nós de 0 a 3 automaticamente, custando **zero** quando ocioso.
+*   **Log Retention Policy**: Retenção de métricas (Prometheus) e logs otimizada para reduzir custos de armazenamento persistente.
 
 ## 🛠 Stack Tecnológica
 
@@ -41,6 +49,7 @@ Dashboards, métricas e alertas tratados como código (Observability as Code).
 | **Progressive Delivery** | Argo Rollouts | Canary Deployments |
 | **Observabilidade** | Prometheus & Grafana | Monitoramento e Dashboards |
 | **Segurança** | Checkov, Trivy & NetPol | DevSecOps & Zero Trust |
+| **Infraestrutura** | Terraform & GKE (Spot) | IaC & Cost Optimization |
 | **Release** | Semantic Release | Versionamento Automático |
 
 ## 🚀 Como Executar
@@ -50,6 +59,22 @@ Dashboards, métricas e alertas tratados como código (Observability as Code).
 *   Docker
 *   Kubernetes (Minikube/Kind/GKE)
 *   **GitOps Ready**: O Sloth CRD e todas as dependências são gerenciados automaticamente via Kustomize.
+*   [Google Cloud SDK](https://cloud.google.com/sdk/docs/install) (Para deploy em GKE)
+*   [Terraform](https://developer.hashicorp.com/terraform/install) (Para IaC)
+
+### Provisionando Infraestrutura (Terraform)
+Este projeto inclui uma configuração Terraform completa para subir um cluster GKE otimizado (Spot/Standard).
+
+```bash
+cd terraform
+
+# Autenticar no GCP
+gcloud auth application-default login
+
+# Inicializar e Aplicar
+terraform init
+terraform apply
+```
 
 ### Desenvolvimento Local
 ```bash

@@ -18,13 +18,13 @@ RUN apk add --no-cache dumb-init && \
     npm install -g npm@latest
 
 # Create a non-root user
-USER node
+# UID 10001 (non-root)
+USER 10001
 
-
-# Copy only necessary files
-COPY --chown=node:node --from=builder /usr/src/app/node_modules ./node_modules
-COPY --chown=node:node package.json ./
-COPY --chown=node:node src ./src
+# Copy only necessary files from the build stage
+COPY --from=build /usr/src/app/node_modules ./node_modules
+COPY --from=build /usr/src/app/dist ./dist
+COPY --from=build /usr/src/app/package.json ./package.json
 
 ENV NODE_ENV=production
 ENV PORT=3000
