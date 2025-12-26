@@ -52,6 +52,15 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.50.1"
   },
+  "overrides": {
+    "glob": "^10.5.0",
+    "jest": {
+      "glob": "^7.2.3"
+    },
+    "ts-jest": {
+      "glob": "^7.2.3"
+    }
+  },
   "jest": {
     "moduleFileExtensions": [
       "js",
