@@ -245,7 +245,7 @@ resource "helm_release" "prometheus" {
   # Configurar persistência leve (ou desativar para economizar se quiser, mas mantemos 8GB)
   set {
     name  = "server.persistentVolume.size"
-    value = "4Gi"
+    value = "8Gi"
   }
 
   # Otimização de Custo: Reduzir retenção de 7d para 2d
