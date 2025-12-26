@@ -153,9 +153,21 @@ resource "google_container_node_pool" "spot_nodes" {
     max_node_count = 3
   }
 
+  # CKV_GCP_9, CKV_GCP_10: Node Management
+  management {
+    auto_repair  = true
+    auto_upgrade = true
+  }
+
   node_config {
     preemptible  = true # Spot Instances (~60-90% discount)
     machine_type = "e2-standard-2" # 2 vCPU, 8GB RAM (Bom custo benefício)
+
+    # CKV_GCP_68: Secure Boot
+    shielded_instance_config {
+      enable_secure_boot = true
+      enable_integrity_monitoring = true
+    }
 
     # Scopes mínimos necessários
     oauth_scopes = [
