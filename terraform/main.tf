@@ -60,7 +60,10 @@ resource "google_container_cluster" "primary" {
   name     = "node-k8s-cluster"
   location = var.region
 
-  enable_autopilot = true
+  enable_autopilot = false
+  
+  remove_default_node_pool = true
+  initial_node_count       = 1
   
   network    = "default"
   subnetwork = "default"
@@ -129,12 +132,46 @@ resource "google_container_cluster" "primary" {
   ]
 }
 
+# Node Pool Spot (Cost Optimization)
+resource "google_container_node_pool" "spot_nodes" {
+  name       = "spot-node-pool"
+  location   = var.region
+  cluster    = google_container_cluster.primary.name
+  
+  # Autoscaling (0 a 3 nós para economizar ao máximo)
+  autoscaling {
+    min_node_count = 0
+    max_node_count = 3
+  }
+
+  node_config {
+    preemptible  = true # Spot Instances (~60-90% discount)
+    machine_type = "e2-standard-2" # 2 vCPU, 8GB RAM (Bom custo benefício)
+
+    # Scopes mínimos necessários
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/cloud-platform"
+    ]
+
+    labels = {
+      "node-role" = "spot-worker"
+    }
+
+    tags = ["spot-node"]
+    
+    # Workload Identity support
+    workload_metadata_config {
+      mode = "GKE_METADATA"
+    }
+  }
+}
+
 # Criar Namespace dedicado para a aplicação (SRE Best Practice)
 resource "kubernetes_namespace" "node_app_ns" {
   metadata {
     name = "node-k8s-app"
   }
-  depends_on = [google_container_cluster.primary]
+  depends_on = [google_container_node_pool.spot_nodes]
 }
 
 # 1. Instalar ArgoCD via Helm
@@ -154,7 +191,7 @@ resource "helm_release" "argocd" {
     value = "NodePort"
   }
 
-  depends_on = [google_container_cluster.primary]
+  depends_on = [google_container_node_pool.spot_nodes]
 }
 
 # 2. Instalar Argo Rollouts via Helm
@@ -173,7 +210,7 @@ resource "helm_release" "argo_rollouts" {
     value = "false"
   }
 
-  depends_on = [google_container_cluster.primary]
+  depends_on = [google_container_node_pool.spot_nodes]
 }
 
 # 4. Instalar Prometheus via Helm (Otimizado)
@@ -202,9 +239,10 @@ resource "helm_release" "prometheus" {
     value = "4Gi"
   }
 
+  # Otimização de Custo: Reduzir retenção de 7d para 2d
   set {
     name  = "server.retention"
-    value = "7d"
+    value = "2d"
   }
 
   set {
@@ -221,7 +259,7 @@ resource "helm_release" "prometheus" {
     yamlencode({
       server = {
         global = {
-          scrape_interval = "15s"
+          scrape_interval = "30s" # Relaxar intervalo para 30s (menos CPU)
           scrape_timeout  = "10s"
         }
       }
@@ -229,7 +267,7 @@ resource "helm_release" "prometheus" {
   ]
 
   # Permitir que o Prometheus rode nas instâncias Spot
-  depends_on = [google_container_cluster.primary]
+  depends_on = [google_container_node_pool.spot_nodes]
 }
 
 output "kubernetes_cluster_name" {
