@@ -99,9 +99,16 @@ resource "google_container_cluster" "primary" {
   # } # checkov:skip=CKV_GCP_64:Acesso simplificado para portfólio público
   # checkov:skip=CKV_GCP_25:Acesso simplificado para portfólio público
 
-  # CKV_GCP_12: Network Policy
+  # CKV_GCP_12: Network Policy (Standard GKE requires enabling the addon)
   network_policy {
     enabled = true
+    provider = "CALICO"
+  }
+
+  addons_config {
+    network_policy_config {
+      disabled = false
+    }
   }
 
   # CKV_GCP_69: Workload Identity / GKE Metadata Server
