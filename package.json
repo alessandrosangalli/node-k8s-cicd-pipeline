@@ -1,6 +1,6 @@
 {
   "name": "node-k8s-service",
-  "version": "1.32.0",
+  "version": "1.33.0",
   "description": "Gold Standard Node.js Service for K8s",
   "scripts": {
     "build": "nest build",
