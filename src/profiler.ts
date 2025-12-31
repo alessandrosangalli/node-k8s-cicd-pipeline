@@ -11,6 +11,7 @@ async function startProfiler() {
     try {
         // Dynamic import to avoid crash if the binary is missing (common in Windows dev without build tools)
         // using import() is the standard way to load modules dynamically in TS/ESM
+        // @ts-ignore
         const profiler = await import('@google-cloud/profiler');
 
         await profiler.start({
@@ -26,6 +27,9 @@ async function startProfiler() {
         // Fail gracefully.
         // 1. Missing Binary (Visual C++ missing on Windows) -> MODULE_NOT_FOUND
         // 2. Missing Credentials (Local Dev) -> Error
+        if (process.env.NODE_ENV === 'production') {
+            throw new Error(`Google Cloud Profiler failed to start in production: ${err.message}`);
+        }
         console.warn(
             'Google Cloud Profiler skipped. This is expected in local development if binaries or credentials are missing.\n',
             `Reason: ${err.message}`
