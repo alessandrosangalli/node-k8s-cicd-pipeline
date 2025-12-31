@@ -71,6 +71,7 @@
     "testEnvironment": "node"
   },
   "overrides": {
-    "test-exclude": "^7.0.1"
+    "test-exclude": "^7.0.1",
+    "qs": "^6.14.1"
   }
 }
