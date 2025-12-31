@@ -22,6 +22,11 @@ Dashboards, métricas e alertas tratados como código (Observability as Code).
 *   **Distributed Tracing (Tempo)**: Rastreamento completo de requisições ponta-a-ponta integrado ao Grafana.
 *   **Grafana as Code**: Dashboards e Data Sources provisionados automaticamente via ConfigMaps.
 *   **Golden Signals**: Monitoramento nativo de Latência, Tráfego, Erros e Saturação via OpenTelemetry.
+*   **Unified Logging (Gold Standard)**:
+    *   **Structured Logs**: Logs em formato JSON canônico para produção (fácil indexação) e formato Human-Readable para desenvolvimento local.
+    *   **Trace Context Injection**: Cada linha de log contém `trace_id` e `span_id` injetados automaticamente do contexto OpenTelemetry, permitindo correlação imediata entre Logs <-> Traces.
+    *   **Security Redaction**: Mascaramento automático de dados sensíveis (`password`, `token`, `authorization`) diretamente no processo de serialização.
+    *   **Enriched Context**: Rastreamento automático de IP de origem e User-Agent em todas as requisições HTTP.
 
 ### 4. Segurança em Profundidade (DevSecOps)
 *   **Zero Trust Networking**: Network Policies estritas (Calico) que bloqueiam por padrão todo o tráfego lateral no cluster.
