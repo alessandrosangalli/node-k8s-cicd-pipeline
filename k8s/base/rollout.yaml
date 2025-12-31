@@ -76,6 +76,8 @@ spec:
           env:
             - name: NODE_ENV
               value: "production"
+            - name: GCP_PROJECT_ID
+              value: "node-k8s-cicd-pipeline"
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: "http://otel-collector.node-k8s-app.svc.cluster.local:4318"
             - name: OTEL_EXPORTER_OTLP_PROTOCOL
