@@ -7,8 +7,10 @@ import { LoggerModule } from "./logger/logger.module";
 
 import { RequestLoggingMiddleware } from "./logger/request-logging.middleware";
 
+import { UsersModule } from "./users/users.module";
+
 @Module({
-  imports: [LoggerModule],
+  imports: [LoggerModule, UsersModule],
   controllers: [AppController, MetricsController],
   providers: [],
 })
