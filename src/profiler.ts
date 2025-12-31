@@ -10,9 +10,8 @@ async function startProfiler() {
 
     try {
         // Dynamic import to avoid crash if the binary is missing (common in Windows dev without build tools)
-        // using require because import() is async and we want to catch module resolution errors safely
-        // eslint-disable-next-line @typescript-eslint/no-var-requires
-        const profiler = require('@google-cloud/profiler');
+        // using import() is the standard way to load modules dynamically in TS/ESM
+        const profiler = await import('@google-cloud/profiler');
 
         await profiler.start({
             projectId: PROJECT_ID, // If undefined, it will auto-discover from GKE metadata/ADC
