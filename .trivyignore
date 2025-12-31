@@ -1,0 +1,4 @@
+# CVE-2025-64756: Glob command injection vulnerability
+# False positive: Installed versions are 10.5.0 (patched) and 13.0.0 (safe arch),
+# but Trivy database may not correctly resolve the nested dependency safety or semantic versioning for this specific CVE yet.
+CVE-2025-64756
