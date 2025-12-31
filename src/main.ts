@@ -1,3 +1,4 @@
+import "./profiler"; // Must be the very first import to hook into the process
 import sdk from "./tracing";
 import { AppLoggerService } from "./logger/logger.service";
 

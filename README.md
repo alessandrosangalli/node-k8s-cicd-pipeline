@@ -20,6 +20,7 @@ A pipeline implementa **Semantic Versioning** totalmente automatizado:
 Dashboards, métricas e alertas tratados como código (Observability as Code).
 *   **SLOs as Code (Sloth)**: Definição científica de confiabilidade com **Service Level Objectives** de Disponibilidade (99.9%) e Latência (95% < 500ms).
 *   **Distributed Tracing (Tempo)**: Rastreamento completo de requisições ponta-a-ponta integrado ao Grafana.
+*   **Continuous Profiling (Google Cloud Profiler)**: Análise contínua de CPU e Heap em produção com overhead insignificante (eBPF-like experience), permitindo detecção de gargalos de performance em nível de código (FinOps).
 *   **Grafana as Code**: Dashboards e Data Sources provisionados automaticamente via ConfigMaps.
 *   **Golden Signals**: Monitoramento nativo de Latência, Tráfego, Erros e Saturação via OpenTelemetry.
 *   **Unified Logging (Gold Standard)**:
@@ -128,6 +129,13 @@ kubectl port-forward -n argocd svc/argocd-server 8080:443
 # Grafana (Dashboards SRE)
 kubectl port-forward -n node-k8s-app svc/grafana 3004:80
 ```
+
+### Google Cloud Profiler (Performance)
+Para visualizar os dados de CPU e Memória (Heap):
+1.  Acesse o [Google Cloud Console](https://console.cloud.google.com/profiler).
+2.  Selecione o serviço `node-k8s-service`.
+3.  Visualize os "Flame Graphs" para identificar gargalos.
+> **Nota**: O Profiler só envia dados quando rodando no GKE (Produção/HML) para evitar custos e ruído de desenvolvimento local.
 
 ---
 *Este projeto serve como um modelo vivo para práticas avançadas de Engenharia de Plataforma.*
