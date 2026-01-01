@@ -243,6 +243,19 @@ resource "helm_release" "argo_rollouts" {
   depends_on = [google_container_node_pool.spot_nodes]
 }
 
+# 3. Instalar KEDA via Helm (Event Driven Autoscaling - Predictive)
+resource "helm_release" "keda" {
+  name             = "keda"
+  repository       = "https://kedacore.github.io/charts"
+  chart            = "keda"
+  namespace        = "keda"
+  create_namespace = true
+  version          = "2.12.0" # Versão estável recente
+  wait             = false
+
+  depends_on = [google_container_node_pool.spot_nodes]
+}
+
 # 4. Instalar Prometheus via Helm (Otimizado)
 resource "helm_release" "prometheus" {
   name             = "prometheus"
@@ -297,6 +310,37 @@ resource "helm_release" "prometheus" {
   ]
 
   # Permitir que o Prometheus rode nas instâncias Spot
+  depends_on = [google_container_node_pool.spot_nodes]
+}
+
+
+# 5. Instalar Chaos Mesh via Helm (Chaos Engineering)
+resource "helm_release" "chaos_mesh" {
+  name             = "chaos-mesh"
+  repository       = "https://charts.chaos-mesh.org"
+  chart            = "chaos-mesh"
+  namespace        = "chaos-mesh"
+  create_namespace = true
+  version          = "2.6.2" # Versão estável recente
+
+  # Chaos Mesh requer privilégios elevados (CRDs, Network manipulation)
+  # Instalar CRDs automaticamente
+  set {
+    name  = "chaosDaemon.runtime"
+    value = "containerd" # GKE usa containerd
+  }
+
+  set {
+    name  = "chaosDaemon.socketPath"
+    value = "/run/containerd/containerd.sock"
+  }
+  
+  # Habilitar Dashboard para visualização (opcional, bom para demo)
+  set {
+    name  = "dashboard.enabled"
+    value = "true"
+  }
+
   depends_on = [google_container_node_pool.spot_nodes]
 }
 

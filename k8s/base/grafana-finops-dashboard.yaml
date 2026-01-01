@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: finops-dashboard
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+    team: devops
+data:
+  finops-dashboard.json: |
+    {
+      "title": "FinOps: Unit Economics & Efficiency",
+      "timezone": "browser",
+      "panels": [
+        {
+          "title": "Estimated Cost (Hourly)",
+          "type": "stat",
+          "gridPos": { "h": 6, "w": 4, "x": 0, "y": 0 },
+          "targets": [
+            {
+              "expr": "sum(kube_pod_container_resource_requests{resource=\"cpu\"}) * 0.04",
+              "legendFormat": "Est. Cost ($)"
+            }
+          ]
+        },
+        {
+          "title": "Cost per Transaction (Unit Economic)",
+          "type": "timeseries",
+          "gridPos": { "h": 8, "w": 12, "x": 4, "y": 0 },
+          "targets": [
+            {
+              "expr": "(sum(rate(container_cpu_usage_seconds_total{namespace=\"node-k8s-app\"}[5m])) * 0.04) / sum(rate(http_requests_total{namespace=\"node-k8s-app\"}[5m]))",
+              "legendFormat": "$ / Request"
+            }
+          ]
+        },
+        {
+          "title": "Resource Efficiency (Request vs Usage)",
+          "type": "gauge",
+          "gridPos": { "h": 6, "w": 4, "x": 16, "y": 0 },
+          "targets": [
+            {
+              "expr": "sum(rate(container_cpu_usage_seconds_total{namespace=\"node-k8s-app\"}[5m])) / sum(kube_pod_container_resource_requests{namespace=\"node-k8s-app\", resource=\"cpu\"})",
+              "legendFormat": "CPU Efficiency"
+            }
+          ]
+        }
+      ]
+    }

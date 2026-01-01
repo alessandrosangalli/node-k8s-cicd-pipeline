@@ -1,0 +1,15 @@
+apiVersion: chaos-mesh.org/v1alpha1
+kind: PodChaos
+metadata:
+  name: pod-kill-random
+  namespace: chaos-mesh
+spec:
+  action: pod-kill
+  mode: one
+  selector:
+    namespaces:
+      - node-k8s-app
+    labelSelectors:
+      app: node-k8s-app
+  scheduler:
+    cron: "@every 5m"

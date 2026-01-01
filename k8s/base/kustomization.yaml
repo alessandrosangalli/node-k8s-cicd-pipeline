@@ -8,11 +8,12 @@ resources:
 - sloth-crd.yaml
 - rollout.yaml
 - service.yaml
-- hpa.yaml
+- scaled-object.yaml
 - ingress.yaml
 - analysis.yaml
 - backend-config.yaml
 - grafana.yaml
+- grafana-finops-dashboard.yaml
 - pdb.yaml
 - tempo.yaml
 - otel-collector.yaml

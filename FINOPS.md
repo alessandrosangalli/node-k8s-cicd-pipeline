@@ -47,10 +47,20 @@ It is highly recommended to configure a Budget in the Google Cloud Billing Conso
 3. Set a monthly threshold (e.g., $50).
 4. Configure alerts at 50%, 90%, and 100% of the budget.
 
-## 5. Right Sizing (Auto-scaling)
+## 5. Showback & Unit Economics (Value-based Costing)
 
-The node pool is configured with Cluster Autoscaler:
-- **Min Nodes:** 0 (Scale to zero supported to avoid idle costs)
-- **Max Nodes:** 3 (Cap costs)
+**Status:** Implemented via Grafana
 
-This ensures we only pay for the compute we absolutely need.
+We move beyond simple "cost tracking" to "value tracking".
+- **Dashboard:** `FinOps: Unit Economics & Efficiency` (Grafana)
+- **Key Metric:** `Cost per Transaction` (Custo por Transação).
+- **Goal:** Understand if cost increases are due to inefficiency (bad) or business growth (good).
+
+## 6. Predictive Autoscaling (KEDA)
+
+**Status:** Implemented
+
+Instead of reactive scaling (waiting for CPU to spike), we use **KEDA** to scale proactively:
+- **Traffic-based:** Scales *before* CPU saturation based on RPS (Requests Per Second).
+- **Time-based (Cron):** Pre-scales the cluster during business hours (08:00 - 20:00) to handle predictable load.
+- **Node Savings:** The Cluster Autoscaler works in tandem, provisioning nodes only when KEDA demands more pods.

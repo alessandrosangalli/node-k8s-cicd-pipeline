@@ -29,16 +29,6 @@ Dashboards, métricas e alertas tratados como código (Observability as Code).
     *   **Security Redaction**: Mascaramento automático de dados sensíveis (`password`, `token`, `authorization`) diretamente no processo de serialização.
     *   **Enriched Context**: Rastreamento automático de IP de origem e User-Agent em todas as requisições HTTP.
 
-### 4. Segurança em Profundidade (DevSecOps)
-*   **Zero Trust Networking**: Network Policies estritas (Calico) que bloqueiam por padrão todo o tráfego lateral no cluster.
-*   **Node Hardening**: Nodes utilizam **Secure Boot** (Shielded GKE Nodes) e integridade verificada de bootloader. A gestão é automatizada com Auto-Repair e Auto-Upgrade.
-*   **Imutabilidade & Integridade**: Imagens fixadas via **SHA256 Digest** e sistema de arquivos do container em modo **Read-Only**.
-*   **IaC Security Scanner**: Uso de **Checkov** para análise estática em manifestos Kubernetes e Terraform (0 falhas críticas).
-*   **Supply Chain Security (Novo!)**:
-    *   **SBOM (Software Bill of Materials)**: Geração automática de SBOM em formato SPDX a cada release, anexado nos artefatos do GitHub Release.
-    *   **Monitoramento Contínuo**: Pipeline noturna (`Nightly Scan`) que monitora novas vulnerabilidades (CVEs) em imagens já deployadas, garantindo segurança pós-deploy.
-    *   **Escaneamento de Vulnerabilidades**: Uso de **Trivy** (CVE scan) automatizado na pipeline CI.
-*   **Rootless Execution**: Containers rodam com usuário não-root (UID 10001) e capabilities de kernel removidas.
 
 ### 4. Segurança em Profundidade (DevSecOps)
 *   **Zero Trust Networking**: Network Policies estritas (Calico) que bloqueiam por padrão todo o tráfego lateral no cluster.
@@ -60,14 +50,23 @@ Arquitetura desenhada para eficiência econômica máxima sem sacrificar a robus
 *   **Spot Fleet Strategy**: O ambiente de produção roda, em **Spot Instances (Preemptible)**, reduzindo os custos de computação em até **90%** em comparação com instâncias sob demanda.
 > 📖 [Leia o Guia Completo de FinOps](./FINOPS.md) para detalhes sobre a estratégia de custo e alocação.
 *   **Resiliência a Falhas**: A aplicação foi projetada para sobreviver à natureza volátil das instâncias Spot (Chaos Engineering nativo).
-    *   **Autoscaling Inteligente**: O cluster escala seus nós de 0 a 3 automaticamente, custando **zero** quando ocioso.
+    *   **Autoscaling Inteligente (Preditivo)**: Uso do **KEDA (Kubernetes Event-driven Autoscaling)** para escalar baseado em tráfego (RPS) ou horários comerciais, antecipando picos de demanda antes que a CPU sature.
+    *   **Unit Economics Dashboard**: Visualização de "Custo por Transação" no Grafana, permitindo correlacionar gastos de nuvem diretamente com valor de negócio entregue.
     *   **Log Retention Policy**: Retenção de métricas (Prometheus) e logs otimizada para reduzir custos de armazenamento persistente.
 
-### 6. Capacidade de Autocura (Self-healing)
+### 7. Capacidade de Autocura (Self-healing)
 Mecanismos robustos que garantem a disponibilidade da aplicação sem intervenção humana:
 *   **Liveness Probes Inteligentes**: Detecção de travamentos do Event Loop (Node.js) ou Deadlocks. Se a aplicação não responder em 1s, o pod é reiniciado automaticamente após 3 falhas.
 *   **Startup Probes**: Proteção durante a inicialização para evitar "Kill Loops" em momentos de lentidão no boot (ex: conexão com banco demorada). A aplicação tem até 5 minutos (30 x 10s) para ficar saudável antes de desistir.
 *   **Readiness Probes**: Remoção imediata do pod do Load Balancer em caso de sobrecarga momentânea (latência alta), evitando erros 5xx para o usuário final.
+
+### 8. Engenharia de Caos (Novo!)
+A resiliência é validada proativamente através da injeção controlada de falhas:
+*   **Chaos Mesh**: Plataforma de Chaos Engineering integrada ao cluster.
+*   **Experimentos Automatizados**:
+    *   **Pod Kill**: Eliminação aleatória de pods para validar a recuperação automática do Kubernetes (ReplicaSet).
+    *   **Network Latency**: Injeção de latência e falhas de rede para validar timeouts e retries entre microserviços.
+> 📖 [Leia o Guia de Engenharia de Caos](./CHAOS_ENGINEERING.md) para aprender a executar os experimentos.
 
 ## 🛠 Stack Tecnológica
 
@@ -80,21 +79,137 @@ Mecanismos robustos que garantem a disponibilidade da aplicação sem intervenç
 | **Progressive Delivery** | Argo Rollouts | Canary Deployments |
 | **Observabilidade** | Prometheus & Grafana | Monitoramento e Dashboards |
 | **Segurança** | Checkov, Trivy & NetPol | DevSecOps & Zero Trust |
+| **Engenharia de Caos** | Chaos Mesh | Testes de Resiliência & Fault Injection |
 | **Infraestrutura** | Terraform & GKE (Spot) | IaC & Cost Optimization |
 | **Release** | Semantic Release | Versionamento Automático |
 
 ## 🚀 Como Executar
 
-### Pré-requisitos
-*   Node.js 20+
-*   Docker
-*   Kubernetes (Minikube/Kind/GKE)
-*   **GitOps Ready**: O Sloth CRD e todas as dependências são gerenciados automaticamente via Kustomize.
-*   [Google Cloud SDK](https://cloud.google.com/sdk/docs/install) (Para deploy em GKE)
-*   [Terraform](https://developer.hashicorp.com/terraform/install) (Para IaC)
+## 💻 Setup Local de Desenvolvimento (Guia Fedora/Linux)
 
-### Provisionando Infraestrutura (Terraform)
-Este projeto inclui uma configuração Terraform completa para subir um cluster GKE otimizado (Spot/Standard).
+Este guia detalhado cobre todo o setup necessário para preparar uma estação de trabalho profissional, seguindo as melhores práticas de **DevSecOps**.
+
+### 1. Ferramentas Essenciais (Base System)
+Instale os pacotes base do sistema operacional:
+```bash
+sudo dnf install -y git curl wget unzip make gcc-c++
+```
+
+### 2. Runtime: Node.js (via NVM)
+Utilize o **NVM (Node Version Manager)** para gerenciar a versão do Node.js, evitando poluir o sistema operacional e garantindo a versão correta do projeto.
+
+```bash
+# 1. Instalar NVM
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+
+# 2. Recarregar shell (ou feche e abra o terminal)
+source ~/.bashrc
+
+# 3. Instalar Node.js 22 (LTS)
+nvm install 22
+nvm use 22
+nvm alias default 22
+
+# 4. Habilitar Corepack (para Yarn/Pnpm se necessário)
+corepack enable
+```
+
+### 3. Container Engine: Docker
+Necessário para construir a imagem da aplicação e rodar containers locais.
+
+```bash
+# 1. Adicionar repositório oficial
+sudo dnf -y install dnf-plugins-core
+sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+
+# 2. Instalar Docker Engine
+sudo dnf install -y docker-ce docker-ce-cli containerd.io
+
+# 3. Iniciar e habilitar serviço
+sudo systemctl start docker
+sudo systemctl enable docker
+
+# 4. Configurar permissões (para rodar sem sudo)
+sudo usermod -aG docker $USER
+newgrp docker
+```
+
+### 4. Segurança & Qualidade (Shift-Left)
+Ferramentas mandatórias para garantir que o código esteja seguro e padronizado **antes** do commit.
+
+```bash
+# 1. Python & Pip (Requisito para Pre-commit/Checkov)
+sudo dnf install -y python3-pip
+
+# 2. Pre-commit (Gerenciador de Hooks de Git)
+pip install pre-commit
+
+# 3. Checkov (Scanner de IaC - Terraform/K8s)
+pip install checkov
+
+# 4. Trivy (Scanner de Vulnerabilidades e Filesystem)
+# Nota: Verifique a versão mais recente em https://github.com/aquasecurity/trivy/releases
+sudo rpm -ivh https://github.com/aquasecurity/trivy/releases/download/v0.58.1/trivy_0.58.1_Linux-64bit.rpm
+```
+
+### 5. Infraestrutura Cloud (GCP & Kubernetes)
+
+```bash
+# 1. Google Cloud SDK
+# Adicione o repo do Google Cloud SDK
+sudo tee -a /etc/yum.repos.d/google-cloud-sdk.repo << EOM
+[google-cloud-cli]
+name=Google Cloud CLI
+baseurl=https://packages.cloud.google.com/yum/repos/cloud-sdk-el9-x86_64
+enabled=1
+gpgcheck=1
+repo_gpgcheck=0
+gpgkey=https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+EOM
+
+sudo dnf install -y google-cloud-cli google-cloud-cli-gke-gcloud-auth-plugin kubectl
+
+# 2. Terraform (via TFEnv)
+# Best Practice: Use TFEnv para gerenciar versões do Terraform por projeto
+git clone --depth=1 https://github.com/tfutils/tfenv.git ~/.tfenv
+echo 'export PATH="$HOME/.tfenv/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+tfenv install latest
+tfenv use latest
+```
+
+## 🚀 Inicializando o Projeto
+
+Com o ambiente configurado, siga os passos para rodar o projeto localmente:
+
+### 1. Setup do Repositório
+```bash
+# Clone o projeto
+git clone <URL_DO_REPO>
+cd node-k8s-cicd-pipeline
+
+# Instale as dependências
+npm ci
+
+# IMPORTANTE: Instale os Hooks de Git
+# Isso ativa as verificações automáticas de segurança (Trivy/Checkov)
+pre-commit install
+```
+
+### 2. Rodando a Aplicação
+```bash
+# Modo de Desenvolvimento (Watch Mode + Logs formatados)
+npm run dev
+
+# Rodar Testes Unitários
+npm test
+
+# Rodar Pipeline de Validação Local (Simula o CI)
+pre-commit run --all-files
+```
+
+## ☁️ Provisionando Infraestrutura (Terraform)
+Se desejar subir o cluster GKE real para testes:
 
 ```bash
 cd terraform
@@ -105,23 +220,6 @@ gcloud auth application-default login
 # Inicializar e Aplicar
 terraform init
 terraform apply
-```
-
-### Desenvolvimento Local
-```bash
-# Instalar dependências
-npm install
-
-# Rodar em modo de desenvolvimento
-npm run dev
-
-# Instalar Hooks de Segurança (Opcional, mas recomendado)
-# Requer Python/pip instalado
-pip install pre-commit
-pre-commit install
-
-# Rodar testes
-npm test
 ```
 
 ### Simulando um Release

@@ -1,0 +1,36 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: node-k8s-scaledobject
+  namespace: node-k8s-app
+  labels:
+    deploymentName: node-k8s-app
+    team: devops
+    cost-center: "1001"
+spec:
+  scaleTargetRef:
+    apiVersion: argoproj.io/v1alpha1
+    kind: Rollout
+    name: node-k8s-app
+  minReplicaCount: 1
+  maxReplicaCount: 10
+  cooldownPeriod: 30
+  pollingInterval: 30
+  triggers:
+  # Trigger 1: Predictive/Reactive via HTTP Traffic (Prometheus)
+  # Escala se o RPS total > 10 por réplica (Exemplo)
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus-server.monitoring.svc.cluster.local
+      metricName: http_requests_total
+      threshold: '10'
+      query: sum(rate(http_requests_total{app="node-k8s-app"}[2m]))
+  
+  # Trigger 2: Predictive via Cron (Time-based)
+  # Escala antecipadamente para lidar com picos conhecidos
+  - type: cron
+    metadata:
+      timezone: America/Sao_Paulo
+      start: "0 8 * * 1-5" # 08:00 Seg-Sex
+      end: "0 20 * * 1-5"  # 20:00 Seg-Sex
+      desiredReplicas: "3" # Garante min 3 replicas durante horario comercial
