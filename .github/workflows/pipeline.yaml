@@ -165,14 +165,15 @@ jobs:
           # Use the digest from the build step
           DIGEST="${{ steps.build-image.outputs.digest }}"
           IMAGE_URL="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@$DIGEST"
+          PROJECT_ID="${{ steps.auth.outputs.project_id }}"
           
-          # Sign the image digest and create an attestation using the beta command
+          # Sign the image digest and create an attestation using the beta command and dynamic project ID
           gcloud beta container binauthz attestations sign-and-create \
-            --project="node-k8s-app" \
+            --project="$PROJECT_ID" \
             --artifact-url="$IMAGE_URL" \
             --attestor="ci-pipeline-attestor" \
-            --attestor-project="node-k8s-app" \
-            --keyversion-project="node-k8s-app" \
+            --attestor-project="$PROJECT_ID" \
+            --keyversion-project="$PROJECT_ID" \
             --keyversion-location="us-central1" \
             --keyversion-keyring="binauth-key-ring" \
             --keyversion-key="binauth-signer-key" \
