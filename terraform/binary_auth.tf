@@ -57,7 +57,7 @@ resource "google_binary_authorization_attestor" "ci_attestor" {
     note_reference = google_container_analysis_note.attestor_note.name
     
     public_keys {
-      id = google_kms_crypto_key.binauth_key.id
+      id = data.google_kms_crypto_key_version.binauth_key_version.id
       pkix_public_key {
         public_key_pem = data.google_kms_crypto_key_version.binauth_key_version.public_key[0].pem
         signature_algorithm = data.google_kms_crypto_key_version.binauth_key_version.public_key[0].algorithm
@@ -120,6 +120,13 @@ resource "google_project_iam_member" "kms_signer" {
 resource "google_project_iam_member" "note_attacher" {
   project = var.project_id
   role    = "roles/containeranalysis.notes.attacher"
+  member  = "serviceAccount:${google_service_account.cicd_attestor.email}"
+}
+
+# Permission to create occurrences (Required for sign-and-create)
+resource "google_project_iam_member" "occurrence_editor" {
+  project = var.project_id
+  role    = "roles/containeranalysis.occurrences.editor"
   member  = "serviceAccount:${google_service_account.cicd_attestor.email}"
 }
 

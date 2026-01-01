@@ -169,6 +169,7 @@ jobs:
           
           # Sign the image digest and create an attestation using the beta command and dynamic project ID
           gcloud beta container binauthz attestations sign-and-create \
+            --quiet \
             --project="$PROJECT_ID" \
             --artifact-url="$IMAGE_URL" \
             --attestor="ci-pipeline-attestor" \
