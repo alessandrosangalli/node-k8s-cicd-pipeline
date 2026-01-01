@@ -130,6 +130,13 @@ resource "google_project_iam_member" "occurrence_editor" {
   member  = "serviceAccount:${google_service_account.cicd_attestor.email}"
 }
 
+# Permission to View Notes
+resource "google_project_iam_member" "note_viewer" {
+  project = var.project_id
+  role    = "roles/containeranalysis.notes.viewer"
+  member  = "serviceAccount:${google_service_account.cicd_attestor.email}"
+}
+
 # Grant access to the Note explicitly
 resource "google_container_analysis_note_iam_member" "note_iam" {
   note = google_container_analysis_note.attestor_note.name
