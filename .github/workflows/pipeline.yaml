@@ -18,6 +18,8 @@ env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
 
+permissions: read-all
+
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
@@ -96,8 +98,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: release
     permissions:
-      contents: read
+      contents: write # to be able to publish a GitHub release
       packages: write
+      id-token: write # Required for Workload Identity Federation
+
     if: needs.release.outputs.new_release_published == 'true'
     steps:
       - name: Checkout code
@@ -117,6 +121,22 @@ jobs:
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.release.outputs.new_release_version }},${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
+      - name: Generate SBOM
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'image'
+          format: 'spdx-json'
+          output: 'sbom.spdx.json'
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.release.outputs.new_release_version }}
+
+      - name: Upload SBOM to Release
+        uses: softprops/action-gh-release@v1
+        if: needs.release.outputs.new_release_published == 'true'
+        with:
+          tag_name: v${{ needs.release.outputs.new_release_version }}
+          files: sbom.spdx.json
+
+
       - name: Scan Image with Trivy
         uses: aquasecurity/trivy-action@master
         with:
@@ -126,6 +146,34 @@ jobs:
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Create Binary Authorization Attestation
+        run: |
+          # Get the digest of the image we just pushed
+          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.release.outputs.new_release_version }})
+          
+          # Sign the image digest and create an attestation
+          gcloud container binauthz attestations sign-and-create \
+            --project="node-k8s-app" \
+            --artifact-url="$DIGEST" \
+            --attestor="ci-pipeline-attestor" \
+            --attestor-project="node-k8s-app" \
+            --keyversion-project="node-k8s-app" \
+            --keyversion-location="us-central1" \
+            --keyversion-keyring="binauth-key-ring" \
+            --keyversion-key="binauth-signer-key" \
+            --keyversion="1"
+
 
   # NOTE: In a true GitOps workflow (ArgoCD), we don't 'push' to K8s.
   # Instead, we update the K8s manifest version in the git repo.

@@ -1,1 +1,11 @@
+
+# Run pre-commit checks if available
+if command -v pre-commit >/dev/null 2>&1; then
+    echo "Running pre-commit checks..."
+    pre-commit run --config .pre-commit-config.yaml || exit 1
+else
+    echo "WARNING: pre-commit not found. Skipping security checks."
+    echo "Please install pre-commit: pip install pre-commit"
+fi
+
 npx lint-staged

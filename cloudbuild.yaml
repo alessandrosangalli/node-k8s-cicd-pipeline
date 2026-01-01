@@ -1,0 +1,31 @@
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Build'
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/node-app:$COMMIT_SHA', '.']
+
+- name: 'gcr.io/cloud-builders/docker'
+  id: 'Push'
+  args: ['push', 'gcr.io/$PROJECT_ID/node-app:$COMMIT_SHA']
+
+- name: 'gcr.io/$PROJECT_ID/binauthz-attestation' # You would typically build a custom builder or use a script
+  id: 'Attest'
+  entrypoint: 'bash'
+  args:
+    - '-c'
+    - |
+      echo "Creating attestation for image..."
+      # Install gcloud component if needed, or use a builder that has it
+      # In Cloud Build, we can use the gcloud builder usually.
+      
+      DIGEST=$(gcloud container images describe gcr.io/$PROJECT_ID/node-app:$COMMIT_SHA --format='get(image_summary.digest)')
+      
+      gcloud beta container binauthz attestations sign-and-create \
+          --project="$PROJECT_ID" \
+          --artifact-url="gcr.io/$PROJECT_ID/node-app@$DIGEST" \
+          --attestor="ci-pipeline-attestor" \
+          --attestor-project="$PROJECT_ID" \
+          --keyversion-project="$PROJECT_ID" \
+          --keyversion-location="us-central1" \
+          --keyversion-keyring="binauth-key-ring" \
+          --keyversion-key="binauth-signer-key" \
+          --keyversion="1"

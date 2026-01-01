@@ -80,6 +80,13 @@ resource "google_container_cluster" "primary" {
   resource_labels = {
     environment = "production"
     project     = "node-k8s-app"
+    team        = "devops"
+    cost-center = "1001"
+  }
+
+  # FinOps: Enable Cost Allocation
+  cost_management_config {
+    enabled = true
   }
 
   # CKV_GCP_23: Alias IP ranges
@@ -175,7 +182,9 @@ resource "google_container_node_pool" "spot_nodes" {
     ]
 
     labels = {
-      "node-role" = "spot-worker"
+      "node-role"   = "spot-worker"
+      "team"        = "devops"
+      "cost-center" = "1001"
     }
 
     tags = ["spot-node"]

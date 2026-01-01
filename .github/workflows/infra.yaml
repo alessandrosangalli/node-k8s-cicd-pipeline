@@ -9,6 +9,10 @@ on:
   pull_request:
     paths:
       - 'terraform/**'
+    paths:
+      - 'terraform/**'
+
+permissions: read-all
 
 jobs:
   terraform:

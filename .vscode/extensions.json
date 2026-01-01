@@ -1,0 +1,6 @@
+{
+    "recommendations": [
+        "bridgecrew.checkov",
+        "aquasecurity.trivy-vulnerability-scanner"
+    ]
+}

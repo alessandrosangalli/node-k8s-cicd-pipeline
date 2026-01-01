@@ -3,6 +3,8 @@ name: 'Destroy Infrastructure'
 on:
   workflow_dispatch: # Permite execução apenas manual pelo painel do GitHub
 
+permissions: read-all
+
 jobs:
   terraform-destroy:
     name: 'Terraform Destroy'

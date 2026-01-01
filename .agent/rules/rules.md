@@ -9,5 +9,5 @@ trigger: always_on
 5 - NUNCA execute comandos que modifiquem o cluster Kubernetes (kubectl apply, kubectl delete, kubectl patch, kubectl edit, etc) - todas as mudanças devem ser commitadas no Git e a pipeline CI/CD automatizada faz o deploy via GitOps/ArgoCD. Apenas execute comandos que fazem consultas para ajudar na tomada de decisão.
 6 - Esse é um projeto de portfólio, sempre leve isso em consideração, ele sempre será uma amostra do meu conhecimento sobre as questões que envolvem o projeto
 7 - Não execute alterações no git, apenas comandos de consulta e atualização local.
-8 - Leve em consideração que eu estou usando Windows PowerShell para os comandos que você gerar ou tentar executar no terminal.
+8 - Leve em consideração que eu estou usando Fedora para os comandos que você gerar ou tentar executar no terminal.
 9 - O código deve seguir o padrão imperative shell, functional core. Referência: Scott Wlaschin, “Moving IO to the edges of your app: Functional Core, Imperative Shell”. Pondere quando devemos usar uma abordagem mais funcional ou mais OOP, prefira códigos funcionais, com foco em testabilidade de output.

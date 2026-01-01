@@ -34,15 +34,40 @@ Dashboards, métricas e alertas tratados como código (Observability as Code).
 *   **Node Hardening**: Nodes utilizam **Secure Boot** (Shielded GKE Nodes) e integridade verificada de bootloader. A gestão é automatizada com Auto-Repair e Auto-Upgrade.
 *   **Imutabilidade & Integridade**: Imagens fixadas via **SHA256 Digest** e sistema de arquivos do container em modo **Read-Only**.
 *   **IaC Security Scanner**: Uso de **Checkov** para análise estática em manifestos Kubernetes e Terraform (0 falhas críticas).
-*   **Supply Chain Security**: Escaneamento de vulnerabilidades com **Trivy** (CVE scan) automatizado na pipeline.
+*   **Supply Chain Security (Novo!)**:
+    *   **SBOM (Software Bill of Materials)**: Geração automática de SBOM em formato SPDX a cada release, anexado nos artefatos do GitHub Release.
+    *   **Monitoramento Contínuo**: Pipeline noturna (`Nightly Scan`) que monitora novas vulnerabilidades (CVEs) em imagens já deployadas, garantindo segurança pós-deploy.
+    *   **Escaneamento de Vulnerabilidades**: Uso de **Trivy** (CVE scan) automatizado na pipeline CI.
 *   **Rootless Execution**: Containers rodam com usuário não-root (UID 10001) e capabilities de kernel removidas.
 
-### 5. FinOps & Otimização de Custos (Novo!)
+### 4. Segurança em Profundidade (DevSecOps)
+*   **Zero Trust Networking**: Network Policies estritas (Calico) que bloqueiam por padrão todo o tráfego lateral no cluster.
+*   **Node Hardening**: Nodes utilizam **Secure Boot** (Shielded GKE Nodes) e integridade verificada de bootloader. A gestão é automatizada com Auto-Repair e Auto-Upgrade.
+*   **Imutabilidade & Integridade**: Imagens fixadas via **SHA256 Digest** e sistema de arquivos do container em modo **Read-Only**.
+*   **IaC Security Scanner**: Uso de **Checkov** para análise estática em manifestos Kubernetes e Terraform (0 falhas críticas).
+*   **Supply Chain Security**: Escaneamento de vulnerabilidades com **Trivy** (CVE scan) automatizado na pipeline.
+*   **Binary Authorization (Novo!)**: Garantia criptográfica de que apenas imagens construídas e assinadas pela pipeline de CI/CD confiável (GitHUB Actions + KMS Asymmetric Signing) podem ser executadas no cluster.
+*   **Rootless Execution**: Containers rodam com usuário não-root (UID 10001) e capabilities de kernel removidas.
+
+### 5. Deep Shift-Left (Novo!)
+Segurança integrada diretamente no fluxo de desenvolvimento (IDE e Local):
+*   **Pre-Commit Hooks**: Validação automática de segurança (Checkov e Trivy) antes mesmo do `git commit`. Impede que códigos inseguros ou dependências vulneráveis cheguem ao repositório.
+*   **IDE Integration**: Extensões recomendadas para VS Code que alertam sobre problemas de segurança em tempo real enquanto você digita.
+*   **Políticas como Código**: As mesmas regras que rodam na pipeline CI/CD rodam na máquina do desenvolvedor.
+
+### 6. FinOps & Otimização de Custos (Novo!)
 Arquitetura desenhada para eficiência econômica máxima sem sacrificar a robustez:
 *   **Spot Fleet Strategy**: O ambiente de produção roda, em **Spot Instances (Preemptible)**, reduzindo os custos de computação em até **90%** em comparação com instâncias sob demanda.
+> 📖 [Leia o Guia Completo de FinOps](./FINOPS.md) para detalhes sobre a estratégia de custo e alocação.
 *   **Resiliência a Falhas**: A aplicação foi projetada para sobreviver à natureza volátil das instâncias Spot (Chaos Engineering nativo).
-*   **Autoscaling Inteligente**: O cluster escala seus nós de 0 a 3 automaticamente, custando **zero** quando ocioso.
-*   **Log Retention Policy**: Retenção de métricas (Prometheus) e logs otimizada para reduzir custos de armazenamento persistente.
+    *   **Autoscaling Inteligente**: O cluster escala seus nós de 0 a 3 automaticamente, custando **zero** quando ocioso.
+    *   **Log Retention Policy**: Retenção de métricas (Prometheus) e logs otimizada para reduzir custos de armazenamento persistente.
+
+### 6. Capacidade de Autocura (Self-healing)
+Mecanismos robustos que garantem a disponibilidade da aplicação sem intervenção humana:
+*   **Liveness Probes Inteligentes**: Detecção de travamentos do Event Loop (Node.js) ou Deadlocks. Se a aplicação não responder em 1s, o pod é reiniciado automaticamente após 3 falhas.
+*   **Startup Probes**: Proteção durante a inicialização para evitar "Kill Loops" em momentos de lentidão no boot (ex: conexão com banco demorada). A aplicação tem até 5 minutos (30 x 10s) para ficar saudável antes de desistir.
+*   **Readiness Probes**: Remoção imediata do pod do Load Balancer em caso de sobrecarga momentânea (latência alta), evitando erros 5xx para o usuário final.
 
 ## 🛠 Stack Tecnológica
 
@@ -89,6 +114,11 @@ npm install
 
 # Rodar em modo de desenvolvimento
 npm run dev
+
+# Instalar Hooks de Segurança (Opcional, mas recomendado)
+# Requer Python/pip instalado
+pip install pre-commit
+pre-commit install
 
 # Rodar testes
 npm test
