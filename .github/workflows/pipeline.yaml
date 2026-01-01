@@ -115,6 +115,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
+        id: build-image
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -159,13 +160,14 @@ jobs:
 
       - name: Create Binary Authorization Attestation
         run: |
-          # Get the digest of the image we just pushed
-          DIGEST=$(docker inspect --format='{{index .RepoDigests 0}}' ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.release.outputs.new_release_version }})
+          # Use the digest from the build step
+          DIGEST="${{ steps.build-image.outputs.digest }}"
+          IMAGE_URL="${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@$DIGEST"
           
-          # Sign the image digest and create an attestation
-          gcloud container binauthz attestations sign-and-create \
+          # Sign the image digest and create an attestation using the beta command
+          gcloud beta container binauthz attestations sign-and-create \
             --project="node-k8s-app" \
-            --artifact-url="$DIGEST" \
+            --artifact-url="$IMAGE_URL" \
             --attestor="ci-pipeline-attestor" \
             --attestor-project="node-k8s-app" \
             --keyversion-project="node-k8s-app" \
